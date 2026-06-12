@@ -1,6 +1,6 @@
 [{
   "modid": "tinymobfarm",
-  "name": "Tiny Mob Farm Community Edition",
+  "name": "Tiny Mob Farm CE",
   "description": "A Minecraft Mod that adds single block mob farms that generates mob drops passively.",
   "version": "${version}",
   "mcversion": "${mcversion}",

@@ -11,7 +11,7 @@ tile.tinymobfarm:emerald_farm.name=Изумрудная моб ферма
 tile.tinymobfarm:inferno_farm.name=Адская моб ферма
 tile.tinymobfarm:ultimate_farm.name=Продвинутая моб ферма
 
-itemGroup.tinymobfarm=Tiny Mob Farm Community Edition
+itemGroup.tinymobfarm=Tiny Mob Farm CE
 
 tinymobfarm.error.cannot_capture_boss=Этот моб в черном листе
 tinymobfarm.error.blacklisted_mob=Этот моб в черном листе
