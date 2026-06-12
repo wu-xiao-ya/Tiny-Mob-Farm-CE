@@ -1,1 +1,14 @@
-.gradle/ .vscode/ bin/ build/ run/ *.log *.sparkprofile chunk_*.js main_bundle.js spark_*.txt spark_*.js spark_*.html spark_*.png upstream/
+.gradle/
+.vscode/
+bin/
+build/
+run/
+*.log
+*.sparkprofile
+chunk_*.js
+main_bundle.js
+spark_*.txt
+spark_*.js
+spark_*.html
+spark_*.png
+upstream/

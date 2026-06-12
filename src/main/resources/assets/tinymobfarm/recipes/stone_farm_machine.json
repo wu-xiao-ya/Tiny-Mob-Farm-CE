@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "IRI",
+    "HFH",
+    "III"
+  ],
+  "key": {
+    "I": [{
+      "item": "minecraft:iron_ingot"
+    }],
+    "R": [{
+      "item": "minecraft:redstone"
+    }],
+    "H": [{
+      "item": "minecraft:hopper"
+    }],
+    "F": [{
+      "item": "tinymobfarm:stone_farm"
+    }]
+  },
+  "result": {
+    "item": "tinymobfarm:stone_farm_machine"
+  }
+}

@@ -1,0 +1,13 @@
+[{
+  "modid": "tinymobfarm",
+  "name": "Tiny Mob Farm Community Edition",
+  "description": "A Minecraft Mod that adds single block mob farms that generates mob drops passively.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/davidmaamoaix/TinyMobFarm/",
+  "updateUrl": "",
+  "authorList": ["David Ma"],
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}]

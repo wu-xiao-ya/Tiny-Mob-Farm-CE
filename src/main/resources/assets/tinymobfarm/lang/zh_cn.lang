@@ -1,0 +1,47 @@
+item.tinymobfarm:lasso.name=套索
+
+tile.tinymobfarm:default_mob_farm.name=刷怪场
+tile.tinymobfarm:wood_farm.name=木质刷怪场
+tile.tinymobfarm:stone_farm.name=石质刷怪场
+tile.tinymobfarm:iron_farm.name=铁质刷怪场
+tile.tinymobfarm:gold_farm.name=金质刷怪场
+tile.tinymobfarm:diamond_farm.name=钻石刷怪场
+tile.tinymobfarm:emerald_farm.name=绿宝石刷怪场
+tile.tinymobfarm:inferno_farm.name=炼狱刷怪场
+tile.tinymobfarm:ultimate_farm.name=终极刷怪场
+
+tile.tinymobfarm:wood_farm_machine.name=机械木质刷怪场
+tile.tinymobfarm:stone_farm_machine.name=机械石质刷怪场
+tile.tinymobfarm:iron_farm_machine.name=机械铁质刷怪场
+tile.tinymobfarm:gold_farm_machine.name=机械金质刷怪场
+tile.tinymobfarm:diamond_farm_machine.name=机械钻石刷怪场
+tile.tinymobfarm:emerald_farm_machine.name=机械绿宝石刷怪场
+tile.tinymobfarm:inferno_farm_machine.name=机械炼狱刷怪场
+tile.tinymobfarm:ultimate_farm_machine.name=机械终极刷怪场
+
+itemGroup.tinymobfarm=微型刷怪场社区版
+
+tinymobfarm.error.cannot_capture_boss=无法捕捉 Boss 生物。
+tinymobfarm.error.blacklisted_mob=该生物在黑名单中。
+
+tinymobfarm.gui.higher_tier=该生物需要更高等级的刷怪场。
+tinymobfarm.gui.redstone_disable=已被红石信号禁用。
+tinymobfarm.gui.no_lasso=放入已捕捉生物的套索以启动。
+
+tinymobfarm.tooltip.release_mob=对方块右键以释放生物。
+tinymobfarm.tooltip.mob_name=生物：%s
+tinymobfarm.tooltip.health=生命值：%d/%d
+tinymobfarm.tooltip.hostile=该生物为敌对生物。
+tinymobfarm.tooltip.capture=对生物右键以捕捉。
+
+tinymobfarm.tooltip.hold_shift=按住 %s<SHIFT>%s 查看详情。
+tinymobfarm.tooltip.farm_rate=每 %d 秒生成一次掉落。
+tinymobfarm.tooltip.durability_info=套索耐久损耗：
+tinymobfarm.tooltip.no_hostile=无法刷敌对生物。
+tinymobfarm.tooltip.no_durability=- %d%% 概率不损失耐久
+tinymobfarm.tooltip.default_durability=- %d%% 概率损失 %d 点耐久
+tinymobfarm.tooltip.mechanical=机械版：支持通过管道对套索槽进行输入与输出。
+
+tinymobfarm.tip.redstone=可用红石信号关闭刷怪场。
+tinymobfarm.tip.output_part_1=产出的物品会自动尝试输出到
+tinymobfarm.tip.output_part_2=相邻的容器中。
