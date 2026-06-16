@@ -1,5 +1,9 @@
 # Tiny Mob Farm CE
 
+> Branch status: `main` contains the Minecraft 1.12.2 line. The `1.16.5` branch is the Forge 1.16.5 porting branch and currently contains a buildable migration baseline, not the full gameplay port.
+>
+> 分支状态：`main` 保留 Minecraft 1.12.2 版本线。`1.16.5` 分支用于 Forge 1.16.5 移植，目前是可构建迁移基线，不代表完整玩法已经移植完成。
+
 Tiny Mob Farm CE is a Minecraft 1.12.2 Forge mod that adds compact single-block mob farms. Captured mobs are stored in lassos, and farms passively generate drops based on the captured mob.
 
 中文说明：Tiny Mob Farm CE 是一个 Minecraft 1.12.2 Forge 模组，提供单方块刷怪场。玩家使用套索捕捉生物后，刷怪场会根据套索中的生物被动生成产物。

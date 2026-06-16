@@ -1,15 +1,8 @@
 {
-	"forge_marker": 1,
-	"defaults": {
-		"transform": "forge:default-block"
-	},
-	"variants": {
-		"facing=north": {"model": "tinymobfarm:diamond_farm"},
-		"facing=south": {"model": "tinymobfarm:diamond_farm"},
-		"facing=east": {"model": "tinymobfarm:diamond_farm"},
-		"facing=west": {"model": "tinymobfarm:diamond_farm"},
-		"inventory": {
-			"model": "tinymobfarm:diamond_farm"
-		}
-	}
+  "variants": {
+    "facing=north": { "model": "tinymobfarm:block/diamond_farm" },
+    "facing=south": { "model": "tinymobfarm:block/diamond_farm" },
+    "facing=east": { "model": "tinymobfarm:block/diamond_farm" },
+    "facing=west": { "model": "tinymobfarm:block/diamond_farm" }
+  }
 }

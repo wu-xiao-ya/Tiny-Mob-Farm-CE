@@ -1,15 +1,8 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "transform": "forge:default-block"
-  },
   "variants": {
-    "facing=north": {"model": "tinymobfarm:inferno_farm_machine"},
-    "facing=south": {"model": "tinymobfarm:inferno_farm_machine"},
-    "facing=east": {"model": "tinymobfarm:inferno_farm_machine"},
-    "facing=west": {"model": "tinymobfarm:inferno_farm_machine"},
-    "inventory": {
-      "model": "tinymobfarm:inferno_farm_machine"
-    }
+    "facing=north": { "model": "tinymobfarm:block/inferno_farm_machine" },
+    "facing=south": { "model": "tinymobfarm:block/inferno_farm_machine" },
+    "facing=east": { "model": "tinymobfarm:block/inferno_farm_machine" },
+    "facing=west": { "model": "tinymobfarm:block/inferno_farm_machine" }
   }
 }
