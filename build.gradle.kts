@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "cn.davidma.tinymobfarm"
-version = "1.0.7"
+version = "1.0.8-beta"
 
 base {
     archivesName.set("TinyMobFarm-CE")

@@ -34,19 +34,20 @@ jobs:
       - name: Build
         run: ./gradlew build --no-daemon
 
+      - name: Select release artifact
+        id: artifact
+        run: |
+          artifact="$(find build/libs -maxdepth 1 -type f -name 'TinyMobFarm-CE-*.jar' ! -name '*-dev.jar' | head -n 1)"
+          if [ -z "$artifact" ]; then
+            echo "No release jar found" >&2
+            exit 1
+          fi
+          echo "path=$artifact" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: Tiny Mob Farm CE ${{ github.ref_name }}
-          body: |
-            ## 中文
-            本次发布为 Tiny Mob Farm CE 增加 CraftTweaker 自定义掉落支持。整合包可以按生物注册名添加、移除和清空自定义产物规则；支持单物品、物品数组、固定概率、概率范围和数量区间。命中 CraftTweaker 规则后会替代原版战利品表产物，未命中时仍回退到原有战利品表逻辑。
-
-            农场输出逻辑也进行了优化：输出满时会保留待输出产物，并按新的 `Output Retry Interval Ticks` 配置间隔重试，默认 20 tick，范围 1 到 3600 tick。产物在输出前会先合并可堆叠物品，减少相邻容器模拟和插入压力。掉落来源现在会缓存，套索槽和 CraftTweaker 规则未变化时不会重复解析。
-
-            ## English
-            This release adds CraftTweaker custom drop support to Tiny Mob Farm CE. Modpacks can add, remove, and clear mob-specific custom drop rules by mob registry name, with support for single items, item arrays, fixed chances, chance ranges, and amount ranges. When a CraftTweaker rule matches, it replaces the vanilla loot table output; otherwise, the original loot table behavior is preserved.
-
-            The farm output flow has also been optimized. When output inventories are full, pending drops are retained and retried using the new `Output Retry Interval Ticks` config option, defaulting to 20 ticks with a valid range of 1 to 3600 ticks. Drops are compacted before output to reduce inventory simulation and insertion overhead. Drop sources are now cached so unchanged lasso slots and CraftTweaker rules do not trigger repeated source parsing.
+          body_path: RELEASE_NOTES.md
           files: |
-            build/libs/TinyMobFarm-CE-1.0.7.jar
+            ${{ steps.artifact.outputs.path }}

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.8-beta
+
+### 中文
+
+- 修正并完善俄语本地化文本。
+- 感谢社区贡献者 Yaroslavik / MrKoteo 提供俄语翻译更新。
+
+### English
+
+- Fixed and improved Russian localization text.
+- Thanks to community contributor Yaroslavik / MrKoteo for the Russian translation update.
+
 ## 1.0.7
 
 ### 中文
@@ -27,4 +39,3 @@
 - Drop sources are cached when the lasso slot and CraftTweaker rules are unchanged.
 - Added GitHub Actions release workflow.
 - Updated RetroFuturaGradle to 1.4.1 so GitHub Actions can resolve the build plugin.
-
