@@ -2,18 +2,26 @@ package cn.davidma.tinymobfarm.common.tileentity;
 
 import cn.davidma.tinymobfarm.common.registry.ModItems;
 import cn.davidma.tinymobfarm.common.registry.ModTileEntities;
+import cn.davidma.tinymobfarm.common.container.ContainerMobFarm;
 import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import cn.davidma.tinymobfarm.core.MobFarmTier;
 import cn.davidma.tinymobfarm.core.util.NBTHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.IWorldPosCallable;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -22,7 +30,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
-public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity {
+public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
     private final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -125,6 +133,17 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     public ItemStackHandler getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new TranslationTextComponent(this.getBlockState().getBlock().getDescriptionId());
+    }
+
+    @Nullable
+    @Override
+    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new ContainerMobFarm(windowId, playerInventory, this, IWorldPosCallable.create(this.level, this.worldPosition));
     }
 
     public void dropLasso() {
