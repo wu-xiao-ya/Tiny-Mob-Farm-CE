@@ -15,6 +15,8 @@ public final class NBTHelper {
     public static final String MOB_FARM_DATA = "mobFarmData";
     public static final String CURR_PROGRESS = "currProgress";
     public static final String INVENTORY = "inventory";
+    public static final String PENDING_DROPS = "PendingDrops";
+    public static final String OUTPUT_RETRY_COOLDOWN = "OutputRetryCooldown";
 
     private NBTHelper() {
     }

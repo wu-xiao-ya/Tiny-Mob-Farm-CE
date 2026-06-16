@@ -5,6 +5,7 @@ import cn.davidma.tinymobfarm.common.registry.ModTileEntities;
 import cn.davidma.tinymobfarm.common.container.ContainerMobFarm;
 import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import cn.davidma.tinymobfarm.core.MobFarmTier;
+import cn.davidma.tinymobfarm.core.drop.MobFarmDropManager;
 import cn.davidma.tinymobfarm.core.util.NBTHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
@@ -12,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.inventory.container.Container;
@@ -22,19 +24,26 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
     private final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             TileEntityMobFarm.this.currProgress = 0;
+            TileEntityMobFarm.this.pendingDrops.clear();
+            TileEntityMobFarm.this.outputRetryCooldown = 0;
             TileEntityMobFarm.this.setChangedAndSync();
         }
 
@@ -51,7 +60,9 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     private final LazyOptional<IItemHandler> inventoryCapability = LazyOptional.of(() -> this.inventory);
 
     private MobFarmTier mobFarmTier;
+    private List<ItemStack> pendingDrops = new ArrayList<>();
     private int currProgress;
+    private int outputRetryCooldown;
     private boolean mechanical;
     private boolean powered;
 
@@ -72,10 +83,15 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         }
 
         if (this.isWorking()) {
+            if (this.outputRetryCooldown > 0) {
+                this.outputRetryCooldown--;
+                this.setChanged();
+                return;
+            }
+
             int maxProgress = this.getMaxProgress();
             if (this.currProgress + 1 >= maxProgress) {
-                this.currProgress = 0;
-                this.setChangedAndSync();
+                this.finishProgress(maxProgress);
             } else {
                 this.currProgress++;
                 this.setChanged();
@@ -172,6 +188,8 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         this.mechanical = nbt.getBoolean("Mechanical");
         this.powered = nbt.getBoolean("Powered");
         this.inventory.deserializeNBT(nbt.getCompound(NBTHelper.INVENTORY));
+        this.pendingDrops = this.readDropsFromNBT(nbt.getList(NBTHelper.PENDING_DROPS, Constants.NBT.TAG_COMPOUND));
+        this.outputRetryCooldown = nbt.getInt(NBTHelper.OUTPUT_RETRY_COOLDOWN);
     }
 
     @Override
@@ -184,6 +202,10 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         nbt.putBoolean("Mechanical", this.mechanical);
         nbt.putBoolean("Powered", this.powered);
         nbt.put(NBTHelper.INVENTORY, this.inventory.serializeNBT());
+        if (!this.pendingDrops.isEmpty()) {
+            nbt.put(NBTHelper.PENDING_DROPS, this.writeDropsToNBT(this.pendingDrops));
+        }
+        nbt.putInt(NBTHelper.OUTPUT_RETRY_COOLDOWN, this.outputRetryCooldown);
         return nbt;
     }
 
@@ -228,6 +250,135 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     private boolean isLassoValid(ItemStack stack) {
         return !stack.isEmpty() && stack.getItem() == ModItems.LASSO.get() && NBTHelper.hasMob(stack);
+    }
+
+    private void finishProgress(int maxProgress) {
+        List<ItemStack> drops = this.compactDrops(this.pendingDrops.isEmpty()
+                ? MobFarmDropManager.generateDrops(this.getLasso(), (ServerWorld) this.level)
+                : this.copyDrops(this.pendingDrops));
+
+        if (this.outputDrops(drops)) {
+            this.pendingDrops.clear();
+            this.outputRetryCooldown = 0;
+            this.currProgress = 0;
+            this.damageLasso();
+        } else {
+            this.pendingDrops = this.copyDrops(drops);
+            this.outputRetryCooldown = Math.max(1, ConfigTinyMobFarm.getOutputRetryIntervalTicks());
+            this.currProgress = Math.max(0, maxProgress - 1);
+        }
+        this.setChangedAndSync();
+    }
+
+    private boolean outputDrops(List<ItemStack> drops) {
+        this.insertDropsIntoAdjacentInventories(drops);
+        return drops.isEmpty();
+    }
+
+    private void insertDropsIntoAdjacentInventories(List<ItemStack> drops) {
+        for (Direction direction : Direction.values()) {
+            TileEntity tileEntity = this.level.getBlockEntity(this.worldPosition.relative(direction));
+            if (tileEntity == null) {
+                continue;
+            }
+
+            LazyOptional<IItemHandler> capability = tileEntity.getCapability(
+                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+            capability.ifPresent(itemHandler -> {
+                for (int i = 0; i < drops.size(); i++) {
+                    ItemStack remainder = ItemHandlerHelper.insertItemStacked(itemHandler, drops.get(i).copy(), false);
+                    if (remainder.isEmpty()) {
+                        drops.remove(i);
+                        i--;
+                    } else {
+                        drops.set(i, remainder);
+                    }
+                }
+            });
+
+            if (drops.isEmpty()) {
+                return;
+            }
+        }
+    }
+
+    private List<ItemStack> copyDrops(List<ItemStack> drops) {
+        List<ItemStack> copy = new ArrayList<>();
+        for (ItemStack stack : drops) {
+            if (!stack.isEmpty()) {
+                copy.add(stack.copy());
+            }
+        }
+        return copy;
+    }
+
+    private List<ItemStack> compactDrops(List<ItemStack> drops) {
+        List<ItemStack> compacted = new ArrayList<>();
+        for (ItemStack stack : drops) {
+            if (stack.isEmpty()) {
+                continue;
+            }
+
+            ItemStack remaining = stack.copy();
+            for (ItemStack compactedStack : compacted) {
+                if (!remaining.isEmpty()
+                        && remaining.isStackable()
+                        && ItemHandlerHelper.canItemStacksStackRelaxed(compactedStack, remaining)) {
+                    int transfer = Math.min(remaining.getCount(), compactedStack.getMaxStackSize() - compactedStack.getCount());
+                    if (transfer > 0) {
+                        compactedStack.grow(transfer);
+                        remaining.shrink(transfer);
+                    }
+                }
+            }
+
+            while (!remaining.isEmpty()) {
+                ItemStack split = remaining.copy();
+                if (split.getCount() > split.getMaxStackSize()) {
+                    split.setCount(split.getMaxStackSize());
+                }
+                remaining.shrink(split.getCount());
+                compacted.add(split);
+            }
+        }
+        return compacted;
+    }
+
+    private ListNBT writeDropsToNBT(List<ItemStack> drops) {
+        ListNBT list = new ListNBT();
+        for (ItemStack stack : drops) {
+            if (!stack.isEmpty()) {
+                list.add(stack.save(new CompoundNBT()));
+            }
+        }
+        return list;
+    }
+
+    private List<ItemStack> readDropsFromNBT(ListNBT list) {
+        List<ItemStack> drops = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            ItemStack stack = ItemStack.of(list.getCompound(i));
+            if (!stack.isEmpty()) {
+                drops.add(stack);
+            }
+        }
+        return drops;
+    }
+
+    private void damageLasso() {
+        if (this.mobFarmTier == null || this.level == null) {
+            return;
+        }
+
+        ItemStack lasso = this.getLasso();
+        int damage = this.mobFarmTier.getRandomDamage(this.level.random);
+        if (damage <= 0 || lasso.isEmpty()) {
+            return;
+        }
+
+        if (lasso.hurt(damage, this.level.random, null)) {
+            this.setLasso(ItemStack.EMPTY);
+        }
     }
 
     private void setChangedAndSync() {

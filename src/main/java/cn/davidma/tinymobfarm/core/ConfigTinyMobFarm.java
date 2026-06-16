@@ -11,6 +11,7 @@ public final class ConfigTinyMobFarm {
     public static final ForgeConfigSpec.IntValue LASSO_DURABILITY;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOB_BLACKLIST;
     public static final ForgeConfigSpec.ConfigValue<List<? extends Double>> MOB_FARM_SPEED;
+    public static final ForgeConfigSpec.IntValue OUTPUT_RETRY_INTERVAL_TICKS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -29,6 +30,9 @@ public final class ConfigTinyMobFarm {
                 .comment("Seconds required for each farm tier to generate loot once.")
                 .defineList("mobFarmSpeed", Arrays.asList(50.0D, 40.0D, 30.0D, 20.0D, 10.0D, 5.0D, 2.5D, 0.5D),
                         value -> value instanceof Double || value instanceof Integer);
+        OUTPUT_RETRY_INTERVAL_TICKS = builder
+                .comment("Ticks between retry attempts when adjacent inventories cannot accept generated drops.")
+                .defineInRange("outputRetryIntervalTicks", 20, 1, 3600);
         builder.pop();
 
         COMMON_SPEC = builder.build();
@@ -58,5 +62,9 @@ public final class ConfigTinyMobFarm {
         int index = tier.ordinal();
         double seconds = index >= 0 && index < speeds.size() ? speeds.get(index) : 20.0D;
         return Math.max(1, (int) Math.round(seconds * 20.0D));
+    }
+
+    public static int getOutputRetryIntervalTicks() {
+        return OUTPUT_RETRY_INTERVAL_TICKS.get();
     }
 }

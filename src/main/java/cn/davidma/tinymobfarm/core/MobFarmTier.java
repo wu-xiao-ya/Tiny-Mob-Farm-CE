@@ -3,6 +3,8 @@ package cn.davidma.tinymobfarm.core;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.material.Material;
 
+import java.util.Random;
+
 public enum MobFarmTier {
     WOOD("wood_farm", Material.WOOD, 1.0F, false, new int[] {2, 3, 3}),
     STONE("stone_farm", Material.STONE, 1.5F, false, new int[] {1, 2, 3}),
@@ -41,6 +43,10 @@ public enum MobFarmTier {
 
     public int[] getDamageChance() {
         return this.damageChance.clone();
+    }
+
+    public int getRandomDamage(Random random) {
+        return this.damageChance[random.nextInt(this.damageChance.length)];
     }
 
     public AbstractBlock.Properties createBlockProperties() {

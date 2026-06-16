@@ -2,13 +2,26 @@ package cn.davidma.tinymobfarm.core.util;
 
 import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameterSets;
+import net.minecraft.loot.LootParameters;
+import net.minecraft.loot.LootTable;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class EntityHelper {
     private EntityHelper() {
@@ -39,5 +52,26 @@ public final class EntityHelper {
             return ((MobEntity) entity).getLootTable().toString();
         }
         return "";
+    }
+
+    public static List<ItemStack> generateLoot(ResourceLocation lootTableLocation, CompoundNBT mobData, ServerWorld world) {
+        if (lootTableLocation == null) {
+            return new ArrayList<>();
+        }
+
+        LootTable lootTable = world.getServer().getLootTables().get(lootTableLocation);
+        Entity entity = EntityType.loadEntityRecursive(mobData.copy(), world, loadedEntity -> loadedEntity);
+        if (entity == null) {
+            return new ArrayList<>();
+        }
+
+        LootContext context = new LootContext.Builder(world)
+                .withParameter(LootParameters.THIS_ENTITY, entity)
+                .withParameter(LootParameters.DAMAGE_SOURCE, DamageSource.GENERIC)
+                .withParameter(LootParameters.KILLER_ENTITY, entity)
+                .withParameter(LootParameters.DIRECT_KILLER_ENTITY, entity)
+                .withParameter(LootParameters.ORIGIN, Vector3d.ZERO)
+                .create(LootParameterSets.ENTITY);
+        return lootTable.getRandomItems(context);
     }
 }
