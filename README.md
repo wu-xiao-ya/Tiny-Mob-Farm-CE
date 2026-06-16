@@ -78,19 +78,21 @@ Important config values:
 - `Output Retry Interval Ticks`: retry interval after output fails. Default: `20`. Range: `1` to `3600`.
 - `Mob Blacklist`: mob registry names that cannot be captured.
 
-## Builds / 构建
+## Downloads / 下载
 
-Local build:
+- Latest release: https://github.com/wu-xiao-ya/Tiny-Mob-Farm-CE/releases/latest
 
-```powershell
-.\gradlew.bat build
-```
+## Credits / 贡献者
 
-GitHub Releases are built by GitHub Actions on version tags such as `v1.0.7`.
+- Original author: David Ma
+- Community Edition maintainer: wu-xiao-ya
+- Russian localization: Yaroslavik / MrKoteo
 
-Latest release:
+中文：
 
-- https://github.com/wu-xiao-ya/Tiny-Mob-Farm-CE/releases/latest
+- 原作者：David Ma
+- 社区版维护：wu-xiao-ya
+- 俄语本地化：Yaroslavik / MrKoteo
 
 ## Notes / 注意事项
 
@@ -98,4 +100,3 @@ Latest release:
 - CraftTweaker support is designed for modpack-side customization.
 - Custom CraftTweaker drops are farm outputs, not entity kill events.
 - Default loot-table behavior is preserved when no custom rule matches.
-
