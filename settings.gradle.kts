@@ -13,6 +13,13 @@ pluginManagement {
         mavenCentral()
         mavenLocal()
     }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "com.gtnewhorizons.retrofuturagradle") {
+                useModule("com.gtnewhorizons:retrofuturagradle:${requested.version}")
+            }
+        }
+    }
 }
 
 plugins {
