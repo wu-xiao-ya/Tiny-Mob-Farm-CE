@@ -9,7 +9,8 @@ import cn.davidma.tinymobfarm.common.block.BlockMobFarm;
 import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import cn.davidma.tinymobfarm.core.EnumMobFarm;
 import cn.davidma.tinymobfarm.core.Reference;
-import cn.davidma.tinymobfarm.core.util.EntityHelper;
+import cn.davidma.tinymobfarm.core.drop.MobFarmDropManager;
+import cn.davidma.tinymobfarm.core.drop.MobFarmDropManager.DropSource;
 import cn.davidma.tinymobfarm.core.util.FakePlayerHelper;
 import cn.davidma.tinymobfarm.core.util.NBTHelper;
 
@@ -26,7 +27,6 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
@@ -39,10 +39,14 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 	
 	private static final String PENDING_DROPS = "PendingDrops";
 	private List<ItemStack> pendingDrops = new ArrayList<ItemStack>();
+	private int outputRetryCooldown;
+	private DropSource cachedDropSource;
+	private int cachedDropSourceVersion = -1;
 	private final ItemStackHandler inventory = new ItemStackHandler(1) {
 		@Override
 		protected void onContentsChanged(int slot) {
 			TileEntityMobFarm.this.pendingDrops.clear();
+			TileEntityMobFarm.this.clearDropSourceCache();
 			TileEntityMobFarm.this.shouldUpdate = true;
 			if (TileEntityMobFarm.this.world != null && !TileEntityMobFarm.this.world.isRemote) {
 				TileEntityMobFarm.this.saveAndSync();
@@ -65,11 +69,17 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 			this.updateRedstone();
 			this.shouldUpdate = false;
 		}
+		if (this.outputRetryCooldown > 0) {
+			this.outputRetryCooldown--;
+		}
 		if (this.isWorking()) {
 			if (!this.world.isRemote && this.mobFarmData != null) {
+				if (this.outputRetryCooldown > 0 && !this.pendingDrops.isEmpty()) {
+					return;
+				}
 				int maxProgress = this.mobFarmData.getMaxProgress();
 				if (this.currProgress + 1 >= maxProgress) {
-					List<ItemStack> drops = this.pendingDrops.isEmpty() ? this.createDrops() : this.copyDrops(this.pendingDrops);
+					List<ItemStack> drops = this.compactDrops(this.pendingDrops.isEmpty() ? this.createDrops() : this.copyDrops(this.pendingDrops));
 					if (ConfigTinyMobFarm.PAUSE_WHEN_OUTPUT_FULL && !this.canStoreDrops(drops)) {
 						int blockedProgress = Math.max(0, maxProgress - 1);
 						boolean shouldSync = this.currProgress != blockedProgress || this.pendingDrops.isEmpty();
@@ -77,6 +87,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 						if (this.pendingDrops.isEmpty()) {
 							this.pendingDrops = this.copyDrops(drops);
 						}
+						this.outputRetryCooldown = Math.max(1, ConfigTinyMobFarm.OUTPUT_RETRY_INTERVAL_TICKS);
 						if (shouldSync) {
 							this.saveAndSync();
 						}
@@ -88,10 +99,12 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 					if (!this.outputDrops(drops)) {
 						this.pendingDrops = this.copyDrops(drops);
 						this.currProgress = Math.max(0, maxProgress - 1);
+						this.outputRetryCooldown = Math.max(1, ConfigTinyMobFarm.OUTPUT_RETRY_INTERVAL_TICKS);
 						this.saveAndSync();
 						return;
 					}
 					this.pendingDrops.clear();
+					this.outputRetryCooldown = 0;
 					
 					FakePlayer daniel = FakePlayerHelper.getPlayer((WorldServer) world);
 					this.getLasso().damageItem(this.mobFarmData.getRandomDamage(this.world.rand), daniel);
@@ -107,10 +120,21 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 	}
 	
 	private List<ItemStack> createDrops() {
-		ItemStack lasso = this.getLasso();
-		String lootTableLocation = NBTHelper.getBaseTag(lasso).getString(NBTHelper.MOB_LOOTTABLE_LOCATION);
-		if (lootTableLocation.isEmpty()) return new ArrayList<ItemStack>();
-		return this.copyDrops(EntityHelper.generateLoot(new ResourceLocation(lootTableLocation), this.world));
+		return this.copyDrops(this.getDropSource().generateDrops(this.world));
+	}
+
+	private DropSource getDropSource() {
+		int dropSourceVersion = MobFarmDropManager.getDropSourceVersion();
+		if (this.cachedDropSource == null || this.cachedDropSourceVersion != dropSourceVersion) {
+			this.cachedDropSource = MobFarmDropManager.getDropSource(this.getLasso());
+			this.cachedDropSourceVersion = dropSourceVersion;
+		}
+		return this.cachedDropSource;
+	}
+
+	private void clearDropSourceCache() {
+		this.cachedDropSource = null;
+		this.cachedDropSourceVersion = -1;
 	}
 
 	private boolean canStoreDrops(List<ItemStack> drops) {
@@ -190,6 +214,34 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 			}
 		}
 		return copy;
+	}
+
+	private List<ItemStack> compactDrops(List<ItemStack> drops) {
+		List<ItemStack> compacted = new ArrayList<ItemStack>();
+		for (ItemStack stack: drops) {
+			if (stack.isEmpty()) continue;
+
+			ItemStack remaining = stack.copy();
+			for (ItemStack compactedStack: compacted) {
+				if (!remaining.isEmpty() && remaining.isStackable() && ItemHandlerHelper.canItemStacksStackRelaxed(compactedStack, remaining)) {
+					int transfer = Math.min(remaining.getCount(), compactedStack.getMaxStackSize() - compactedStack.getCount());
+					if (transfer > 0) {
+						compactedStack.grow(transfer);
+						remaining.shrink(transfer);
+					}
+				}
+			}
+
+			while (!remaining.isEmpty()) {
+				ItemStack split = remaining.copy();
+				if (split.getCount() > split.getMaxStackSize()) {
+					split.setCount(split.getMaxStackSize());
+				}
+				remaining.shrink(split.getCount());
+				compacted.add(split);
+			}
+		}
+		return compacted;
 	}
 
 	private NBTTagList writeDropsToNBT(List<ItemStack> drops) {
@@ -313,6 +365,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 		this.mechanical = nbt.getBoolean("Mechanical");
 		this.inventory.deserializeNBT(nbt.getCompoundTag(NBTHelper.INVENTORY));
 		this.pendingDrops = this.readDropsFromNBT(nbt.getTagList(PENDING_DROPS, 10));
+		this.outputRetryCooldown = nbt.getInteger("OutputRetryCooldown");
 		this.shouldUpdate = true;
 		
 	}
@@ -326,6 +379,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 		if (!this.pendingDrops.isEmpty()) {
 			nbt.setTag(PENDING_DROPS, this.writeDropsToNBT(this.pendingDrops));
 		}
+		nbt.setInteger("OutputRetryCooldown", this.outputRetryCooldown);
 		return super.writeToNBT(nbt);
 	}
 	

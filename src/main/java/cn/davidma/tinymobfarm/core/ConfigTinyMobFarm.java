@@ -3,6 +3,7 @@ package cn.davidma.tinymobfarm.core;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.Name;
+import net.minecraftforge.common.config.Config.RangeInt;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
 
@@ -28,6 +29,11 @@ public class ConfigTinyMobFarm {
 	@Comment({"启用后，如果本轮掉落无法完整放入相邻物品容器，农场会暂停在完成前；不会扣除套索耐久，也不会把产物掉到世界中。", "When enabled, farms pause before completing if the generated drops cannot fully fit into adjacent item handlers; no lasso durability is consumed and no items are dropped into the world."})
 	@Name("Pause When Output Full")
 	public static boolean PAUSE_WHEN_OUTPUT_FULL = true;
+
+	@Name("Output Retry Interval Ticks")
+	@Comment({"输出失败后的重试间隔，单位 tick。默认 20。范围 1 到 3600。", "Retry interval after output fails, in ticks. Default 20. Range 1 to 3600."})
+	@RangeInt(min = 1, max = 3600)
+	public static int OUTPUT_RETRY_INTERVAL_TICKS = 20;
 	
 	@Comment({"禁止被套索捕捉的生物注册名列表，例如 minecraft:cow。", "Blacklist of mobs that cannot be captured, e.g. minecraft:cow."})
 	@Name("Mob Blacklist")

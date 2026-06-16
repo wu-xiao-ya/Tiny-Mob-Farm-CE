@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "cn.davidma.tinymobfarm"
-version = "1.0.6-ce"
+version = "1.0.7"
 
 base {
     archivesName.set("TinyMobFarm-CE")
@@ -26,11 +26,17 @@ repositories {
         name = "GTNH Maven"
         url = uri("https://nexus.gtnewhorizons.com/repository/public/")
     }
+    maven {
+        name = "BlameJared Maven"
+        url = uri("https://maven.blamejared.com")
+    }
     mavenCentral()
 }
 
 dependencies {
     patchedMinecraft("me.eigenraven.java8unsupported:java-8-unsupported-shim:1.0.0")
+    compileOnly("CraftTweaker2:CraftTweaker2-API:4.1.20.715")
+    compileOnly("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.715")
 }
 
 tasks.processResources.configure {
