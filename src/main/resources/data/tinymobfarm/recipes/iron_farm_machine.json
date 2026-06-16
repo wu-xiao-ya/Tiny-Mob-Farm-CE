@@ -6,18 +6,18 @@
     "III"
   ],
   "key": {
-    "I": [{
+    "I": {
       "item": "minecraft:iron_ingot"
-    }],
-    "R": [{
+    },
+    "R": {
       "item": "minecraft:redstone"
-    }],
-    "H": [{
+    },
+    "H": {
       "item": "minecraft:hopper"
-    }],
-    "F": [{
+    },
+    "F": {
       "item": "tinymobfarm:iron_farm"
-    }]
+    }
   },
   "result": {
     "item": "tinymobfarm:iron_farm_machine"

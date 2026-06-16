@@ -6,20 +6,20 @@
     "III"
   ],
   "key": {
-    "I": [{
+    "I": {
       "item": "minecraft:iron_ingot"
-    }],
-    "R": [{
+    },
+    "R": {
       "item": "minecraft:redstone"
-    }],
-    "H": [{
+    },
+    "H": {
       "item": "minecraft:hopper"
-    }],
-    "F": [{
-      "item": "tinymobfarm:inferno_farm"
-    }]
+    },
+    "F": {
+      "item": "tinymobfarm:ultimate_farm"
+    }
   },
   "result": {
-    "item": "tinymobfarm:inferno_farm_machine"
+    "item": "tinymobfarm:ultimate_farm_machine"
   }
 }
