@@ -10,6 +10,7 @@ public final class ConfigTinyMobFarm {
 
     public static final ForgeConfigSpec.IntValue LASSO_DURABILITY;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOB_BLACKLIST;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Double>> MOB_FARM_SPEED;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -21,6 +22,13 @@ public final class ConfigTinyMobFarm {
         MOB_BLACKLIST = builder
                 .comment("Blacklist of mobs that cannot be captured, e.g. minecraft:cow.")
                 .defineList("mobBlacklist", Arrays.asList(), value -> value instanceof String);
+        builder.pop();
+
+        builder.push("farm");
+        MOB_FARM_SPEED = builder
+                .comment("Seconds required for each farm tier to generate loot once.")
+                .defineList("mobFarmSpeed", Arrays.asList(50.0D, 40.0D, 30.0D, 20.0D, 10.0D, 5.0D, 2.5D, 0.5D),
+                        value -> value instanceof Double || value instanceof Integer);
         builder.pop();
 
         COMMON_SPEC = builder.build();
@@ -40,5 +48,15 @@ public final class ConfigTinyMobFarm {
             }
         }
         return false;
+    }
+
+    public static int getFarmRateTicks(MobFarmTier tier) {
+        if (tier == null) {
+            return 20;
+        }
+        List<? extends Double> speeds = MOB_FARM_SPEED.get();
+        int index = tier.ordinal();
+        double seconds = index >= 0 && index < speeds.size() ? speeds.get(index) : 20.0D;
+        return Math.max(1, (int) Math.round(seconds * 20.0D));
     }
 }

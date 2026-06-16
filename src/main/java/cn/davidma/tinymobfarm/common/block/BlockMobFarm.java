@@ -1,17 +1,25 @@
 package cn.davidma.tinymobfarm.common.block;
 
+import cn.davidma.tinymobfarm.common.tileentity.TileEntityMobFarm;
 import cn.davidma.tinymobfarm.core.MobFarmTier;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
+import net.minecraft.tileentity.TileEntity;
+
+import javax.annotation.Nullable;
 
 public class BlockMobFarm extends Block {
     private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
@@ -49,5 +57,47 @@ public class BlockMobFarm extends Block {
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader world, net.minecraft.util.math.BlockPos pos, ISelectionContext context) {
         return SHAPE;
+    }
+
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return new TileEntityMobFarm();
+    }
+
+    @Override
+    public void setPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(world, pos, state, placer, stack);
+        TileEntity tileEntity = world.getBlockEntity(pos);
+        if (tileEntity instanceof TileEntityMobFarm) {
+            TileEntityMobFarm farm = (TileEntityMobFarm) tileEntity;
+            farm.setMobFarmTier(this.tier);
+            farm.setMechanical(this.mechanical);
+            farm.updateRedstone();
+        }
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, world, pos, block, fromPos, isMoving);
+        TileEntity tileEntity = world.getBlockEntity(pos);
+        if (tileEntity instanceof TileEntityMobFarm) {
+            ((TileEntityMobFarm) tileEntity).updateRedstone();
+            tileEntity.setChanged();
+        }
+    }
+
+    @Override
+    public void playerWillDestroy(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        TileEntity tileEntity = world.getBlockEntity(pos);
+        if (tileEntity instanceof TileEntityMobFarm) {
+            ((TileEntityMobFarm) tileEntity).dropLasso();
+        }
+        super.playerWillDestroy(world, pos, state, player);
     }
 }
