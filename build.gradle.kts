@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.gtnewhorizons.retrofuturagradle") version "1.4.0"
+    id("com.gtnewhorizons.retrofuturagradle") version "1.4.1"
 }
 
 group = "cn.davidma.tinymobfarm"
