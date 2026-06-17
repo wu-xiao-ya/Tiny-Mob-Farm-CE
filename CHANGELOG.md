@@ -4,11 +4,17 @@
 
 ### 中文
 
+- Forge 1.16.5 移植版进入 beta 阶段，并与 1.12.2 社区版同步核心功能进度。
+- 同步 CraftTweaker 自定义产物、输出满暂停、输出重试、掉落来源缓存、机械农场与邻居方块变化重新检测。
+- 修正 1.16.5 农场方块与物品形态渲染。
 - 修正并完善俄语本地化文本。
 - 感谢社区贡献者 Yaroslavik / MrKoteo 提供俄语翻译更新。
 
 ### English
 
+- The Forge 1.16.5 port is now in beta and aligned with the 1.12.2 community feature set.
+- Synced CraftTweaker custom drops, output-full pausing, output retries, drop-source caching, mechanical farms, and neighbor-change output rechecks.
+- Fixed 1.16.5 farm block and item-form rendering.
 - Fixed and improved Russian localization text.
 - Thanks to community contributor Yaroslavik / MrKoteo for the Russian translation update.
 

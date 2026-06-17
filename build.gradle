@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.5-alpha'
+version = '1.0.8-beta'
 group = 'cn.davidma.tinymobfarm'
 archivesBaseName = 'TinyMobFarm-CE'
 
