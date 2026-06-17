@@ -21,6 +21,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
@@ -98,12 +99,12 @@ public class BlockMobFarm extends Block {
     }
 
     @Override
-    public void playerWillDestroy(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public void destroy(IWorld world, BlockPos pos, BlockState state) {
         TileEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof TileEntityMobFarm) {
             ((TileEntityMobFarm) tileEntity).dropLasso();
         }
-        super.playerWillDestroy(world, pos, state, player);
+        super.destroy(world, pos, state);
     }
 
     @Override
