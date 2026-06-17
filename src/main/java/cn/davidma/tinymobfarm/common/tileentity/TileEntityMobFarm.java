@@ -59,7 +59,8 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
             return TileEntityMobFarm.this.isLassoValid(stack);
         }
     };
-    private final LazyOptional<IItemHandler> inventoryCapability = LazyOptional.of(() -> this.inventory);
+    private final IItemHandler automationInventory = new MachineItemHandler();
+    private final LazyOptional<IItemHandler> inventoryCapability = LazyOptional.of(() -> this.automationInventory);
 
     private MobFarmTier mobFarmTier;
     private List<ItemStack> pendingDrops = new ArrayList<>();
@@ -271,6 +272,67 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     private boolean isLassoValid(ItemStack stack) {
         return !stack.isEmpty() && stack.getItem() == ModItems.LASSO.get() && NBTHelper.hasMob(stack);
+    }
+
+    private class MachineItemHandler implements IItemHandler {
+        @Override
+        public int getSlots() {
+            return 1;
+        }
+
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return slot == 0 ? TileEntityMobFarm.this.getLasso() : ItemStack.EMPTY;
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (slot != 0
+                    || stack.isEmpty()
+                    || !TileEntityMobFarm.this.isLassoValid(stack)
+                    || !TileEntityMobFarm.this.getLasso().isEmpty()) {
+                return stack;
+            }
+
+            ItemStack single = stack.copy();
+            single.setCount(1);
+            if (!simulate) {
+                TileEntityMobFarm.this.setLasso(single);
+            }
+
+            ItemStack remainder = stack.copy();
+            remainder.shrink(1);
+            return remainder.isEmpty() ? ItemStack.EMPTY : remainder;
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot != 0 || amount <= 0) {
+                return ItemStack.EMPTY;
+            }
+
+            ItemStack current = TileEntityMobFarm.this.getLasso();
+            if (current.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+
+            ItemStack extracted = current.copy();
+            extracted.setCount(1);
+            if (!simulate) {
+                TileEntityMobFarm.this.setLasso(ItemStack.EMPTY);
+            }
+            return extracted;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return slot == 0 && TileEntityMobFarm.this.isLassoValid(stack);
+        }
     }
 
     private void finishProgress(int maxProgress) {
