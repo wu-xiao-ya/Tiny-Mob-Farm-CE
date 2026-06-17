@@ -43,7 +43,6 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     private final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
-            TileEntityMobFarm.this.currProgress = 0;
             TileEntityMobFarm.this.pendingDrops.clear();
             TileEntityMobFarm.this.outputRetryCooldown = 0;
             TileEntityMobFarm.this.setChangedAndSync();
@@ -88,7 +87,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         }
 
         if (this.isWorking()) {
-            if (this.outputRetryCooldown > 0) {
+            if (this.outputRetryCooldown > 0 && !this.pendingDrops.isEmpty()) {
                 this.outputRetryCooldown--;
                 this.setChanged();
                 return;
