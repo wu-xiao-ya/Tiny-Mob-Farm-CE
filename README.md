@@ -1,19 +1,19 @@
 # Tiny Mob Farm CE
 
-> Branch status: `main` contains the Minecraft 1.12.2 line. The `1.16.5` branch is the Forge 1.16.5 porting branch and currently contains a buildable migration baseline, not the full gameplay port.
+> Branch status: `main` contains the Minecraft 1.12.2 line. The `1.16.5` branch contains the Forge 1.16.5 port with the main gameplay systems migrated and passing build/server-start checks.
 >
-> 分支状态：`main` 保留 Minecraft 1.12.2 版本线。`1.16.5` 分支用于 Forge 1.16.5 移植，目前是可构建迁移基线，不代表完整玩法已经移植完成。
+> 分支状态：`main` 保留 Minecraft 1.12.2 版本线。`1.16.5` 分支用于 Forge 1.16.5 移植，核心玩法系统已迁移，并通过构建与专服启动检查。
 
-Tiny Mob Farm CE is a Minecraft 1.12.2 Forge mod that adds compact single-block mob farms. Captured mobs are stored in lassos, and farms passively generate drops based on the captured mob.
+Tiny Mob Farm CE is a Minecraft Forge mod that adds compact single-block mob farms. Captured mobs are stored in lassos, and farms passively generate drops based on the captured mob.
 
-中文说明：Tiny Mob Farm CE 是一个 Minecraft 1.12.2 Forge 模组，提供单方块刷怪场。玩家使用套索捕捉生物后，刷怪场会根据套索中的生物被动生成产物。
+中文说明：Tiny Mob Farm CE 是一个 Minecraft Forge 模组，提供单方块刷怪场。玩家使用套索捕捉生物后，刷怪场会根据套索中的生物被动生成产物。
 
 ## Requirements / 需求
 
-- Minecraft 1.12.2
-- Minecraft Forge for 1.12.2
+- Minecraft 1.12.2 on `main`, or Minecraft 1.16.5 on the `1.16.5` branch
+- Minecraft Forge for the selected Minecraft version
 - Java 8
-- CraftTweaker 2 is optional and only needed for custom scripted drops.
+- CraftTweaker is optional and only needed for custom scripted drops.
 
 ## Main Features / 主要功能
 
@@ -67,6 +67,7 @@ The example above always produces 16 rotten flesh, then independently rolls a 20
 
 - 同一个生物可以注册多条规则。
 - 每条规则独立判定。
+- 同一生物的多条规则会全部按注册顺序执行并叠加产物；没有优先级参数，也不会只执行第一条。
 - 只要 CraftTweaker 规则命中该生物，就会替代原本的战利品表产物。
 - 如果没有 CraftTweaker 规则命中，则回退到原版战利品表逻辑。
 - 输出失败后保存的是已经判定好的本轮产物，后续重试不会重新抽概率。
@@ -80,6 +81,7 @@ Important config values:
 - `Mob Farm Rate`: production interval for each farm tier, in seconds.
 - `Pause When Output Full`: when enabled, farms wait if generated drops cannot fully fit into adjacent inventories.
 - `Output Retry Interval Ticks`: retry interval after output fails. Default: `20`. Range: `1` to `3600`.
+- `Render Farm Mob Model`: toggles captured mob rendering inside farm blocks.
 - `Mob Blacklist`: mob registry names that cannot be captured.
 
 ## Downloads / 下载

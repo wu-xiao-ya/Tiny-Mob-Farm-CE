@@ -45,6 +45,7 @@ public final class EntityHelper {
         return entity instanceof MobEntity
                 && !(entity instanceof WitherEntity)
                 && !(entity instanceof EnderDragonEntity)
+                && entity.canChangeDimensions()
                 && !entity.isDeadOrDying();
     }
 

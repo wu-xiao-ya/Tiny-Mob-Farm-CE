@@ -355,6 +355,10 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     private boolean outputDrops(List<ItemStack> drops) {
         this.insertDropsIntoAdjacentInventories(drops);
+        if (!ConfigTinyMobFarm.shouldPauseWhenOutputFull()) {
+            this.dropRemainingDrops(drops);
+            drops.clear();
+        }
         return drops.isEmpty();
     }
 
@@ -382,6 +386,19 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
             if (drops.isEmpty()) {
                 return;
             }
+        }
+    }
+
+    private void dropRemainingDrops(List<ItemStack> drops) {
+        for (ItemStack stack : drops) {
+            if (stack.isEmpty()) {
+                continue;
+            }
+            this.level.addFreshEntity(new ItemEntity(this.level,
+                    this.worldPosition.getX() + 0.5D,
+                    this.worldPosition.getY() + 1.0D,
+                    this.worldPosition.getZ() + 0.5D,
+                    stack.copy()));
         }
     }
 

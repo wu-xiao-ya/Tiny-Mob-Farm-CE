@@ -10,9 +10,10 @@ public final class ConfigTinyMobFarm {
 
     public static final ForgeConfigSpec.IntValue LASSO_DURABILITY;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOB_BLACKLIST;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends Double>> MOB_FARM_SPEED;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends Number>> MOB_FARM_SPEED;
     public static final ForgeConfigSpec.IntValue OUTPUT_RETRY_INTERVAL_TICKS;
     public static final ForgeConfigSpec.BooleanValue RENDER_FARM_MOB_MODEL;
+    public static final ForgeConfigSpec.BooleanValue PAUSE_WHEN_OUTPUT_FULL;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -34,6 +35,9 @@ public final class ConfigTinyMobFarm {
         OUTPUT_RETRY_INTERVAL_TICKS = builder
                 .comment("Ticks between retry attempts when adjacent inventories cannot accept generated drops.")
                 .defineInRange("outputRetryIntervalTicks", 20, 1, 3600);
+        PAUSE_WHEN_OUTPUT_FULL = builder
+                .comment("Pause before completing if generated drops cannot fully fit into adjacent inventories.")
+                .define("pauseWhenOutputFull", true);
         RENDER_FARM_MOB_MODEL = builder
                 .comment("Render the captured mob model inside mob farm blocks.")
                 .define("renderFarmMobModel", true);
@@ -62,9 +66,9 @@ public final class ConfigTinyMobFarm {
         if (tier == null) {
             return 20;
         }
-        List<? extends Double> speeds = MOB_FARM_SPEED.get();
+        List<? extends Number> speeds = MOB_FARM_SPEED.get();
         int index = tier.ordinal();
-        double seconds = index >= 0 && index < speeds.size() ? speeds.get(index) : 20.0D;
+        double seconds = index >= 0 && index < speeds.size() ? speeds.get(index).doubleValue() : 20.0D;
         return Math.max(1, (int) Math.round(seconds * 20.0D));
     }
 
@@ -74,5 +78,9 @@ public final class ConfigTinyMobFarm {
 
     public static boolean shouldRenderFarmMobModel() {
         return RENDER_FARM_MOB_MODEL.get();
+    }
+
+    public static boolean shouldPauseWhenOutputFull() {
+        return PAUSE_WHEN_OUTPUT_FULL.get();
     }
 }

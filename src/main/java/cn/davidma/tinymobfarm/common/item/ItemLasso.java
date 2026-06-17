@@ -109,9 +109,9 @@ public class ItemLasso extends Item {
         NBTHelper.setBaseTag(stack, nbt);
 
         if (player.isCreative()) {
-            ItemStack copy = stack.copy();
-            player.inventory.add(copy);
-            NBTHelper.clearMob(stack);
+            ItemStack newLasso = new ItemStack(stack.getItem());
+            NBTHelper.setBaseTag(newLasso, nbt.copy());
+            player.inventory.add(newLasso);
         }
         target.remove();
 
@@ -133,13 +133,14 @@ public class ItemLasso extends Item {
 
         if (entity != null) {
             context.getLevel().addFreshEntity(entity);
-            NBTHelper.clearMob(stack);
-            PlayerEntity player = context.getPlayer();
-            if (player != null) {
-                stack.hurtAndBreak(1, player, brokenPlayer -> brokenPlayer.broadcastBreakEvent(context.getHand()));
-                player.inventory.setChanged();
-                player.inventoryMenu.broadcastChanges();
-            }
+        }
+
+        NBTHelper.clearMob(stack);
+        PlayerEntity player = context.getPlayer();
+        if (player != null) {
+            stack.hurtAndBreak(1, player, brokenPlayer -> brokenPlayer.broadcastBreakEvent(context.getHand()));
+            player.inventory.setChanged();
+            player.inventoryMenu.broadcastChanges();
         }
     }
 
