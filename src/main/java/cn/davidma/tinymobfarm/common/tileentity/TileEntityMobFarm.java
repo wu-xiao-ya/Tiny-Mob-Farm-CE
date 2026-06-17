@@ -76,7 +76,12 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     @Override
     public void tick() {
-        if (this.level == null || this.level.isClientSide) {
+        if (this.level == null) {
+            return;
+        }
+
+        if (this.level.isClientSide) {
+            this.tickClientProgress();
             return;
         }
 
@@ -267,6 +272,17 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     private int getMaxProgress() {
         return Math.max(1, ConfigTinyMobFarm.getFarmRateTicks(this.mobFarmTier));
+    }
+
+    private void tickClientProgress() {
+        if (this.isWorking()) {
+            int maxProgress = this.getMaxProgress();
+            if (this.currProgress + 1 < maxProgress) {
+                this.currProgress++;
+            }
+        } else if (this.currProgress != 0) {
+            this.currProgress = 0;
+        }
     }
 
     private boolean isLassoValid(ItemStack stack) {
