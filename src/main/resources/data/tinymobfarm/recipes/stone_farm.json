@@ -13,8 +13,7 @@
       "item": "minecraft:bookshelf"
     },
     "C": {
-      "item": "minecraft:stone",
-      "data": 0
+      "item": "minecraft:stone"
     },
     "S": {
       "item": "minecraft:obsidian"
