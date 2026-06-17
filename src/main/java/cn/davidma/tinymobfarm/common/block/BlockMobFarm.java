@@ -100,12 +100,14 @@ public class BlockMobFarm extends Block {
     }
 
     @Override
-    public void destroy(IWorld world, BlockPos pos, BlockState state) {
-        TileEntity tileEntity = world.getBlockEntity(pos);
-        if (tileEntity instanceof TileEntityMobFarm) {
-            ((TileEntityMobFarm) tileEntity).dropLasso();
+    public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
+            if (!world.isClientSide && tileEntity instanceof TileEntityMobFarm) {
+                ((TileEntityMobFarm) tileEntity).dropLasso();
+            }
         }
-        super.destroy(world, pos, state);
+        super.onRemove(state, world, pos, newState, isMoving);
     }
 
     @Override
