@@ -100,6 +100,10 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         }
 
         if (this.isWorking()) {
+            if (!this.canAttemptOutput()) {
+                return;
+            }
+
             if (this.outputRetryCooldown > 0 && !this.pendingDrops.isEmpty()) {
                 this.outputRetryCooldown--;
                 this.setChanged();
@@ -120,6 +124,10 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     }
 
     public boolean isWorking() {
+        return this.hasValidFarmInput();
+    }
+
+    private boolean hasValidFarmInput() {
         ItemStack lasso = this.getLasso();
         return this.mobFarmTier != null
                 && !this.powered
@@ -131,6 +139,12 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     public void updateRedstone() {
         if (this.level != null) {
             this.powered = this.level.hasNeighborSignal(this.worldPosition);
+        }
+    }
+
+    public void onNeighborOutputChanged() {
+        if (!this.pendingDrops.isEmpty()) {
+            this.outputRetryCooldown = 0;
         }
     }
 
@@ -427,6 +441,30 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
             }
         }
 
+        return false;
+    }
+
+    private boolean canAttemptOutput() {
+        return !ConfigTinyMobFarm.shouldPauseWhenOutputFull() || this.hasAdjacentOutputInventory();
+    }
+
+    private boolean hasAdjacentOutputInventory() {
+        if (this.level == null) {
+            return false;
+        }
+
+        for (Direction direction : Direction.values()) {
+            TileEntity tileEntity = this.level.getBlockEntity(this.worldPosition.relative(direction));
+            if (tileEntity == null) {
+                continue;
+            }
+
+            LazyOptional<IItemHandler> capability = tileEntity.getCapability(
+                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+            if (capability.isPresent()) {
+                return true;
+            }
+        }
         return false;
     }
 

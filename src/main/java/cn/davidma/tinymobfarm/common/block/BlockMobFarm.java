@@ -95,6 +95,7 @@ public class BlockMobFarm extends Block {
         if (!world.isClientSide && tileEntity instanceof TileEntityMobFarm) {
             TileEntityMobFarm farm = (TileEntityMobFarm) tileEntity;
             farm.updateRedstone();
+            farm.onNeighborOutputChanged();
             farm.setChangedAndSync();
         }
     }
