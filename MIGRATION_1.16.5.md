@@ -32,11 +32,24 @@ The 1.12.2 Java implementation is intentionally not compiled in this baseline be
 
 ## CraftTweaker
 
-CraftTweaker support is not part of the first 1.16.5 baseline. The 1.12.2 integration depends on CraftTweaker 2 APIs. For 1.16.5, the preferred path is:
+CraftTweaker support has been ported to the 1.16.5 CraftTweaker 7 API as an optional dependency. Scripts use:
 
-1. Port the internal drop rule system.
-2. Add JSON or internal registration support.
-3. Add a CraftTweaker/KubeJS compatibility layer after the core behavior is stable.
+```zenscript
+import mods.tinymobfarm.MobDrops;
+```
+
+When a rule matches the captured mob registry name, the scripted drops replace the vanilla loot table result for that production cycle. If no rule matches, the farm falls back to the vanilla loot table behavior.
+
+The 1.16.5 branch supports the same custom-drop concepts as the mature 1.12.2 line:
+
+- fixed stack amounts using `<item> * amount`;
+- fixed chances;
+- chance ranges;
+- amount ranges when explicitly requested;
+- multiple independent rules for the same mob;
+- `remove` and `clear` rule management.
+
+See `docs/crafttweaker.md` for script examples.
 
 ## High-Risk Porting Areas
 
@@ -46,4 +59,3 @@ CraftTweaker support is not part of the first 1.16.5 baseline. The 1.12.2 integr
 - Menu/screen replacement for the old `IGuiHandler`.
 - Deferred registration for blocks, items, menu types, and block entity types.
 - Captured entity rendering.
-

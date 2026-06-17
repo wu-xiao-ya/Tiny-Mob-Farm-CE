@@ -35,7 +35,7 @@ import mods.tinymobfarm.MobDrops;
 ### Add Fixed Drops / 添加固定产物
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 16);
 ```
 
 Equivalent to 100% chance.
@@ -45,7 +45,7 @@ Equivalent to 100% chance.
 ### Add Fixed Chance / 添加固定概率
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:iron_ingot>, 5);
+MobDrops.add("minecraft:zombie", <item:minecraft:iron_ingot>, 5);
 ```
 
 This rolls one 5% chance for one iron ingot.
@@ -55,7 +55,7 @@ This rolls one 5% chance for one iron ingot.
 ### Add Chance Range / 添加概率范围
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 60, 80);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 16, 60, 80);
 ```
 
 Each production cycle first picks a chance from 60 to 80, then rolls with that chance.
@@ -65,7 +65,7 @@ Each production cycle first picks a chance from 60 to 80, then rolls with that c
 ### Add Amount Range With Fixed Chance / 数量范围 + 固定概率
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh>, 1, 3, 60);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh>, 1, 3, 60);
 ```
 
 If the 60% chance succeeds, the amount is randomly selected from 1 to 3.
@@ -75,9 +75,9 @@ If the 60% chance succeeds, the amount is randomly selected from 1 to 3.
 ### Multiple Independent Rolls / 多次独立判定
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 100);
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 1, 20);
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 1, 30);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 16, 100);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 1, 20);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 1, 30);
 ```
 
 Result:
@@ -100,8 +100,8 @@ Result:
 
 ```zenscript
 MobDrops.add("minecraft:skeleton", [
-    <minecraft:bone> * 2,
-    <minecraft:arrow> * 2
+    <item:minecraft:bone> * 2,
+    <item:minecraft:arrow> * 2
 ]);
 ```
 
@@ -109,8 +109,8 @@ MobDrops.add("minecraft:skeleton", [
 
 ```zenscript
 MobDrops.addChance("minecraft:skeleton", [
-    <minecraft:bone>,
-    <minecraft:arrow>
+    <item:minecraft:bone>,
+    <item:minecraft:arrow>
 ], 1, 3, 50);
 ```
 

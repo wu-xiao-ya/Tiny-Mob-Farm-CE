@@ -68,7 +68,8 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.42'
-    compileOnly 'curse.maven:crafttweaker-239197:5354089'
+    compileOnly 'curse.maven:crafttweaker-239197:5007325'
+    runtimeOnly fg.deobf('curse.maven:crafttweaker-239197:5007325')
 }
 
 processResources {

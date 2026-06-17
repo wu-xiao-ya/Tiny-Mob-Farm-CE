@@ -44,21 +44,21 @@ import mods.tinymobfarm.MobDrops;
 Fixed amount, fixed chance:
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 100);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 16, 100);
 ```
 
 Fixed amount, chance range:
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 60, 80);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 16, 60, 80);
 ```
 
 Multiple independent rolls:
 
 ```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 100);
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 1, 20);
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 1, 30);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 16, 100);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 1, 20);
+MobDrops.add("minecraft:zombie", <item:minecraft:rotten_flesh> * 1, 30);
 ```
 
 The example above always produces 16 rotten flesh, then independently rolls a 20% extra drop and a 30% extra drop.

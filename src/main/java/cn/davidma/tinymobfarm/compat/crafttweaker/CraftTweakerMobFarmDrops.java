@@ -3,60 +3,59 @@ package cn.davidma.tinymobfarm.compat.crafttweaker;
 import cn.davidma.tinymobfarm.core.drop.MobFarmDropManager;
 import cn.davidma.tinymobfarm.core.drop.MobFarmDropRule;
 import cn.davidma.tinymobfarm.core.drop.WeightedDrop;
-import crafttweaker.CraftTweakerAPI;
-import crafttweaker.IAction;
-import crafttweaker.api.item.IItemStack;
-import crafttweaker.api.minecraft.CraftTweakerMC;
-import crafttweaker.annotations.ZenRegister;
+import com.blamejared.crafttweaker.api.CraftTweakerAPI;
+import com.blamejared.crafttweaker.api.actions.IAction;
+import com.blamejared.crafttweaker.api.annotations.ZenRegister;
+import com.blamejared.crafttweaker.api.item.IItemStack;
+import com.blamejared.crafttweaker.api.logger.ILogger;
 import net.minecraft.item.ItemStack;
-import stanhebben.zenscript.annotations.ZenClass;
-import stanhebben.zenscript.annotations.ZenMethod;
+import org.openzen.zencode.java.ZenCodeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ZenRegister
-@ZenClass("mods.tinymobfarm.MobDrops")
+@ZenCodeType.Name("mods.tinymobfarm.MobDrops")
 public final class CraftTweakerMobFarmDrops {
     private CraftTweakerMobFarmDrops() {
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void add(String mobRegistryName, IItemStack[] drops) {
         CraftTweakerAPI.apply(new AddDropsAction(mobRegistryName, drops));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void add(String mobRegistryName, IItemStack drop) {
         CraftTweakerAPI.apply(new AddOneDropAction(mobRegistryName, drop, 100));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void add(String mobRegistryName, IItemStack drop, int chance) {
         CraftTweakerAPI.apply(new AddOneDropAction(mobRegistryName, drop, chance));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void add(String mobRegistryName, IItemStack drop, int minChance, int maxChance) {
         CraftTweakerAPI.apply(new AddOneDropAction(mobRegistryName, drop, minChance, maxChance));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void add(String mobRegistryName, IItemStack drop, int minAmount, int maxAmount, int chance) {
         CraftTweakerAPI.apply(new AddOneDropAction(mobRegistryName, drop, minAmount, maxAmount, chance));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void addChance(String mobRegistryName, IItemStack[] drops, int minAmount, int maxAmount, int chance) {
         CraftTweakerAPI.apply(new AddDropsAction(mobRegistryName, drops, minAmount, maxAmount, chance, chance));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void remove(String mobRegistryName) {
         CraftTweakerAPI.apply(new RemoveDropsAction(mobRegistryName));
     }
 
-    @ZenMethod
+    @ZenCodeType.Method
     public static void clear() {
         CraftTweakerAPI.apply(new ClearDropsAction());
     }
@@ -85,7 +84,7 @@ public final class CraftTweakerMobFarmDrops {
                 continue;
             }
 
-            ItemStack stack = CraftTweakerMC.getItemStack(drop);
+            ItemStack stack = drop.getInternal();
             if (stack.isEmpty()) {
                 continue;
             }
@@ -139,12 +138,15 @@ public final class CraftTweakerMobFarmDrops {
         }
 
         @Override
-        public boolean validate() {
-            return isRuleValid(this.mobRegistryName, this.minAmount, this.maxAmount, this.minChance, this.maxChance)
+        public boolean validate(ILogger logger) {
+            boolean valid = isRuleValid(this.mobRegistryName, this.minAmount, this.maxAmount, this.minChance, this.maxChance)
                     && !this.convertDrops().isEmpty();
+            if (!valid) {
+                logger.error(this.describeInvalid());
+            }
+            return valid;
         }
 
-        @Override
         public String describeInvalid() {
             return "Invalid Tiny Mob Farm drops for " + this.mobRegistryName;
         }
@@ -200,13 +202,16 @@ public final class CraftTweakerMobFarmDrops {
         }
 
         @Override
-        public boolean validate() {
-            return isRuleValid(this.mobRegistryName, this.minAmount, this.maxAmount, this.minChance, this.maxChance)
+        public boolean validate(ILogger logger) {
+            boolean valid = isRuleValid(this.mobRegistryName, this.minAmount, this.maxAmount, this.minChance, this.maxChance)
                     && this.drop != null
                     && !this.drop.isEmpty();
+            if (!valid) {
+                logger.error(this.describeInvalid());
+            }
+            return valid;
         }
 
-        @Override
         public String describeInvalid() {
             return "Invalid Tiny Mob Farm drop for " + this.mobRegistryName;
         }
@@ -237,8 +242,12 @@ public final class CraftTweakerMobFarmDrops {
         }
 
         @Override
-        public boolean validate() {
-            return this.mobRegistryName != null && !this.mobRegistryName.isEmpty();
+        public boolean validate(ILogger logger) {
+            boolean valid = this.mobRegistryName != null && !this.mobRegistryName.isEmpty();
+            if (!valid) {
+                logger.error("Invalid Tiny Mob Farm remove target");
+            }
+            return valid;
         }
     }
 
