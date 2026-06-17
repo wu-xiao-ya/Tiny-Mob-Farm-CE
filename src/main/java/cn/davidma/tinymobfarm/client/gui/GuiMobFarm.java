@@ -7,6 +7,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -14,6 +15,7 @@ import java.util.Arrays;
 
 public class GuiMobFarm extends ContainerScreen<ContainerMobFarm> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/farm_gui.png");
+    private float displayedProgress;
 
     public GuiMobFarm(ContainerMobFarm screenContainer, PlayerInventory inv, ITextComponent title) {
         super(screenContainer, inv, title);
@@ -30,9 +32,18 @@ public class GuiMobFarm extends ContainerScreen<ContainerMobFarm> {
 
         TileEntityMobFarm tile = this.menu.getTileEntityMobFarm();
         if (tile != null && tile.isWorking()) {
-            int progress = (int) (tile.getScaledProgress() * 80.0D);
+            float targetProgress = MathHelper.clamp(this.menu.getSyncProgressPixels(), 0, 80);
+            if (this.displayedProgress <= targetProgress) {
+                this.displayedProgress = Math.min(targetProgress, this.displayedProgress + 6.0F);
+            } else {
+                this.displayedProgress = targetProgress;
+            }
+
+            int progress = MathHelper.clamp((int) this.displayedProgress, 0, 80);
             this.blit(matrixStack, leftPos + 48, topPos + 60, 176, 5, 80, 5);
             this.blit(matrixStack, leftPos + 48, topPos + 60, 176, 0, progress, 5);
+        } else {
+            this.displayedProgress = 0.0F;
         }
     }
 

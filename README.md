@@ -83,6 +83,7 @@ Important config values:
 - `Output Retry Interval Ticks`: retry interval after output fails. Default: `20`. Range: `1` to `3600`.
 - `Render Farm Mob Model`: toggles captured mob rendering inside farm blocks.
 - `Mob Blacklist`: mob registry names that cannot be captured.
+- `Lasso Durability`: on the 1.16.5 branch this value is read during item registration, so changing it requires a restart to take effect.
 
 ## Downloads / 下载
 

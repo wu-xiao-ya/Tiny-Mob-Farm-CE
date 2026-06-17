@@ -8,17 +8,40 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IWorldPosCallable;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class ContainerMobFarm extends Container {
     private final TileEntityMobFarm tileEntityMobFarm;
     private final IWorldPosCallable access;
+    private final IntReferenceHolder progressData;
 
     public ContainerMobFarm(int windowId, PlayerInventory playerInventory, TileEntityMobFarm tileEntityMobFarm, IWorldPosCallable access) {
         super(ModContainers.MOB_FARM.get(), windowId);
         this.tileEntityMobFarm = tileEntityMobFarm;
         this.access = access;
+        this.progressData = tileEntityMobFarm != null ? new IntReferenceHolder() {
+            @Override
+            public int get() {
+                return tileEntityMobFarm.getContainerData().get(0);
+            }
+
+            @Override
+            public void set(int value) {
+                tileEntityMobFarm.getContainerData().set(0, value);
+            }
+        } : new IntReferenceHolder() {
+            @Override
+            public int get() {
+                return 0;
+            }
+
+            @Override
+            public void set(int value) {
+            }
+        };
+        this.addDataSlot(this.progressData);
 
         IItemHandler itemHandler = tileEntityMobFarm != null ? tileEntityMobFarm.getInventory() : new ItemStackHandler(1);
         this.addSlot(new SlotLassoOnly(itemHandler, 0, 80, 25));
@@ -36,6 +59,10 @@ public class ContainerMobFarm extends Container {
 
     public TileEntityMobFarm getTileEntityMobFarm() {
         return this.tileEntityMobFarm;
+    }
+
+    public int getSyncProgressPixels() {
+        return this.progressData.get();
     }
 
     @Override
