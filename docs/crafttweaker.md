@@ -17,6 +17,7 @@ import mods.tinymobfarm.MobDrops;
 - If no rule matches, the farm uses the original loot table behavior.
 - Multiple rules for the same mob are allowed.
 - Each rule is rolled independently.
+- All matching rules run in registration order and their drops are combined. There is no priority value and no first-match-only mode.
 - Pending drops are stored after generation. Output retries do not reroll chances.
 
 中文：
@@ -26,6 +27,7 @@ import mods.tinymobfarm.MobDrops;
 - 没有规则命中时，仍使用原本战利品表逻辑。
 - 同一生物允许写多条规则。
 - 每条规则独立判定。
+- 同一生物的全部匹配规则会按注册顺序执行并合并产物；没有优先级参数，也不会只执行第一条。
 - 产物生成后会保存待输出产物；输出重试不会重新判定概率。
 
 ## API / 接口
@@ -125,4 +127,3 @@ MobDrops.clear();
 - Use multiple `add` calls when you need multiple independent rolls.
 - Use amount ranges only when random stack size is intentional.
 - Avoid combining too many random dimensions in one rule; separate rules are easier to reason about.
-
