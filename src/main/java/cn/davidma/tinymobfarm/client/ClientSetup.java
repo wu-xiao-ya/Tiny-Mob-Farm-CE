@@ -4,6 +4,7 @@ import cn.davidma.tinymobfarm.client.gui.GuiMobFarm;
 import cn.davidma.tinymobfarm.client.render.RenderMobFarm;
 import cn.davidma.tinymobfarm.common.registry.ModContainers;
 import cn.davidma.tinymobfarm.common.registry.ModTileEntities;
+import cn.davidma.tinymobfarm.core.util.ClientHooks;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,6 +19,7 @@ public final class ClientSetup {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
+        ClientHooks.setShiftDown(ClientTooltipHelper::hasShiftDown);
         event.enqueueWork(() -> {
             ScreenManager.register(ModContainers.MOB_FARM.get(), GuiMobFarm::new);
             ClientRegistry.bindTileEntityRenderer(ModTileEntities.MOB_FARM.get(), RenderMobFarm::new);

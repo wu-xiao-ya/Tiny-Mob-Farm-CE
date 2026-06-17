@@ -3,7 +3,7 @@ package cn.davidma.tinymobfarm.common.item;
 import cn.davidma.tinymobfarm.common.block.BlockMobFarm;
 import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import cn.davidma.tinymobfarm.core.MobFarmTier;
-import net.minecraft.client.gui.screen.Screen;
+import cn.davidma.tinymobfarm.core.util.ClientHooks;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -29,7 +29,7 @@ public class ItemBlockMobFarm extends BlockItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        if (!Screen.hasShiftDown()) {
+        if (!ClientHooks.hasShiftDown()) {
             tooltip.add(new TranslationTextComponent("tinymobfarm.tooltip.hold_shift",
                     TextFormatting.ITALIC, TextFormatting.GRAY));
             return;
