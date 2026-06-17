@@ -32,3 +32,13 @@ jobs:
 
       - name: Build
         run: ./gradlew build --no-daemon
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TinyMobFarm-CE-1.16.5
+          path: |
+            build/libs/TinyMobFarm-CE-*.jar
+            !build/libs/*-dev.jar
+          if-no-files-found: error
+          retention-days: 14
