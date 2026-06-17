@@ -19,7 +19,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.IIntArray;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -78,21 +77,6 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     private boolean powered;
     private Entity renderModel;
     private String renderModelMobName = "";
-    private final IIntArray containerData = new IIntArray() {
-        @Override
-        public int get(int index) {
-            return index == 0 ? TileEntityMobFarm.this.getScaledProgressPixels(80) : 0;
-        }
-
-        @Override
-        public void set(int index, int value) {
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-    };
 
     public TileEntityMobFarm() {
         super(ModTileEntities.MOB_FARM.get());
@@ -178,10 +162,6 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     public double getScaledProgress() {
         return this.mobFarmTier == null ? 0.0D : this.currProgress / (double) this.getMaxProgress();
-    }
-
-    public IIntArray getContainerData() {
-        return this.containerData;
     }
 
     public ItemStackHandler getInventory() {
@@ -302,7 +282,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         return Math.max(1, ConfigTinyMobFarm.getFarmRateTicks(this.mobFarmTier));
     }
 
-    private int getScaledProgressPixels(int width) {
+    public int getProgressPixels(int width) {
         if (this.mobFarmTier == null) {
             return 0;
         }
@@ -609,7 +589,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         this.cachedMobData = new CompoundNBT();
     }
 
-    private void setChangedAndSync() {
+    public void setChangedAndSync() {
         this.setChanged();
         if (this.level != null && !this.level.isClientSide) {
             BlockState state = this.getBlockState();

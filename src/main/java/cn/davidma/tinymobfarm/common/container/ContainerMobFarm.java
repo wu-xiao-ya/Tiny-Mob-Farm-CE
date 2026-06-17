@@ -21,24 +21,30 @@ public class ContainerMobFarm extends Container {
         super(ModContainers.MOB_FARM.get(), windowId);
         this.tileEntityMobFarm = tileEntityMobFarm;
         this.access = access;
+        boolean clientSide = playerInventory.player.level.isClientSide;
         this.progressData = tileEntityMobFarm != null ? new IntReferenceHolder() {
+            private int syncedProgressPixels;
+
             @Override
             public int get() {
-                return tileEntityMobFarm.getContainerData().get(0);
+                return clientSide ? this.syncedProgressPixels : tileEntityMobFarm.getProgressPixels(80);
             }
 
             @Override
             public void set(int value) {
-                tileEntityMobFarm.getContainerData().set(0, value);
+                this.syncedProgressPixels = value;
             }
         } : new IntReferenceHolder() {
+            private int syncedProgressPixels;
+
             @Override
             public int get() {
-                return 0;
+                return this.syncedProgressPixels;
             }
 
             @Override
             public void set(int value) {
+                this.syncedProgressPixels = value;
             }
         };
         this.addDataSlot(this.progressData);

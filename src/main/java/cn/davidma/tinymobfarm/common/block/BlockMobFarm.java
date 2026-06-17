@@ -92,9 +92,10 @@ public class BlockMobFarm extends Block {
     public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         super.neighborChanged(state, world, pos, block, fromPos, isMoving);
         TileEntity tileEntity = world.getBlockEntity(pos);
-        if (tileEntity instanceof TileEntityMobFarm) {
-            ((TileEntityMobFarm) tileEntity).updateRedstone();
-            tileEntity.setChanged();
+        if (!world.isClientSide && tileEntity instanceof TileEntityMobFarm) {
+            TileEntityMobFarm farm = (TileEntityMobFarm) tileEntity;
+            farm.updateRedstone();
+            farm.setChangedAndSync();
         }
     }
 

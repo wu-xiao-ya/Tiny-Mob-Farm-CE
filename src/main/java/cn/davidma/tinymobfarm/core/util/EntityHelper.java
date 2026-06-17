@@ -52,7 +52,7 @@ public final class EntityHelper {
     }
 
     public static String getLootTableLocation(LivingEntity entity) {
-        return entity.getType().getDefaultLootTable().toString();
+        return entity.getLootTable().toString();
     }
 
     public static List<ItemStack> generateLoot(ResourceLocation lootTableLocation, CompoundNBT mobData, ServerWorld world) {
