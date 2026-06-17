@@ -105,6 +105,19 @@ MobDrops.add("minecraft:skeleton", [
 ]);
 ```
 
+### Item Arrays With Shared Amount Range / 物品数组 + 共享数量范围
+
+```zenscript
+MobDrops.addChance("minecraft:skeleton", [
+    <minecraft:bone>,
+    <minecraft:arrow>
+], 1, 3, 50);
+```
+
+Each item in the array gets one independent 50% roll. If the roll succeeds, that item's amount is randomly selected from 1 to 3.
+
+数组中的每个物品都会进行一次独立的 50% 判定。判定成功时，该物品数量会在 1 到 3 之间随机。
+
 ### Remove Rules / 移除规则
 
 ```zenscript
