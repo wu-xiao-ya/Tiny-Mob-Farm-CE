@@ -62,11 +62,13 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven { url = 'https://maven.minecraftforge.net' }
+    maven { url = 'https://cursemaven.com' }
     mavenCentral()
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.42'
+    compileOnly 'curse.maven:crafttweaker-239197:5354089'
 }
 
 processResources {
