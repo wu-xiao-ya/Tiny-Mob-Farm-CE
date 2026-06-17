@@ -104,6 +104,7 @@ public class BlockMobFarm extends Block {
 		if (tileEntity instanceof TileEntityMobFarm) {
 			TileEntityMobFarm tileEntityMobFarm = (TileEntityMobFarm) tileEntity;
 			tileEntityMobFarm.updateRedstone();
+			tileEntityMobFarm.onNeighborOutputChanged();
 			tileEntityMobFarm.saveAndSync();
 		}
 	}

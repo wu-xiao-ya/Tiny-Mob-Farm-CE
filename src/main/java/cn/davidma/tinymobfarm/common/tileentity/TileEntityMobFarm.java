@@ -74,6 +74,9 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 		}
 		if (this.isWorking()) {
 			if (!this.world.isRemote && this.mobFarmData != null) {
+				if (!this.canAttemptOutput()) {
+					return;
+				}
 				if (this.outputRetryCooldown > 0 && !this.pendingDrops.isEmpty()) {
 					return;
 				}
@@ -135,6 +138,22 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 	private void clearDropSourceCache() {
 		this.cachedDropSource = null;
 		this.cachedDropSourceVersion = -1;
+	}
+
+	private boolean canAttemptOutput() {
+		return !ConfigTinyMobFarm.PAUSE_WHEN_OUTPUT_FULL || this.hasAdjacentOutputInventory();
+	}
+
+	private boolean hasAdjacentOutputInventory() {
+		if (this.world == null) return false;
+
+		for (EnumFacing facing: EnumFacing.values()) {
+			TileEntity tileEntity = this.world.getTileEntity(this.pos.offset(facing));
+			if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean canStoreDrops(List<ItemStack> drops) {
@@ -297,6 +316,12 @@ public class TileEntityMobFarm extends TileEntity implements ITickable {
 	
 	public void updateRedstone() {
 		this.powered = this.world.isBlockPowered(this.pos);
+	}
+
+	public void onNeighborOutputChanged() {
+		if (!this.pendingDrops.isEmpty()) {
+			this.outputRetryCooldown = 0;
+		}
 	}
 	
 	public ItemStack getLasso() {
