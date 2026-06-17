@@ -24,7 +24,7 @@
   "tinymobfarm.gui.no_lasso": "放入已捕捉生物的套索以启动。",
   "tinymobfarm.tooltip.release_mob": "对方块右键以释放生物。",
   "tinymobfarm.tooltip.mob_name": "生物：%s",
-  "tinymobfarm.tooltip.health": "生命值：%d/%d",
+  "tinymobfarm.tooltip.health": "生命值：%.1f/%.1f",
   "tinymobfarm.tooltip.hostile": "该生物为敌对生物。",
   "tinymobfarm.tooltip.capture": "对生物右键以捕捉。",
   "tinymobfarm.tooltip.hold_shift": "按住 %s<SHIFT>%s 查看详情。",

@@ -41,7 +41,18 @@ public class ItemLasso extends Item {
 
     @Override
     public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity player, LivingEntity target, Hand hand) {
-        if (hasMob(stack) || !EntityHelper.canCapture(target)) {
+        if (hasMob(stack)) {
+            return ActionResultType.PASS;
+        }
+
+        if (EntityHelper.isBoss(target)) {
+            if (!player.level.isClientSide) {
+                player.displayClientMessage(new TranslationTextComponent("tinymobfarm.error.cannot_capture_boss"), true);
+            }
+            return ActionResultType.sidedSuccess(player.level.isClientSide);
+        }
+
+        if (!EntityHelper.canCapture(target)) {
             return ActionResultType.PASS;
         }
 

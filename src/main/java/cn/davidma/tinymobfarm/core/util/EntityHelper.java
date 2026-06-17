@@ -41,11 +41,15 @@ public final class EntityHelper {
         return entity instanceof MonsterEntity;
     }
 
+    public static boolean isBoss(LivingEntity entity) {
+        return entity instanceof WitherEntity
+                || entity instanceof EnderDragonEntity
+                || !entity.canChangeDimensions();
+    }
+
     public static boolean canCapture(LivingEntity entity) {
         return entity instanceof MobEntity
-                && !(entity instanceof WitherEntity)
-                && !(entity instanceof EnderDragonEntity)
-                && entity.canChangeDimensions()
+                && !isBoss(entity)
                 && !entity.isDeadOrDying();
     }
 

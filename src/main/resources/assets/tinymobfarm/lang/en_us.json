@@ -16,7 +16,7 @@
   "tinymobfarm.gui.no_lasso": "Insert a lasso to activate.",
   "tinymobfarm.tooltip.release_mob": "Right click on block to release mob.",
   "tinymobfarm.tooltip.mob_name": "Mob: %s",
-  "tinymobfarm.tooltip.health": "Health: %d/%d",
+  "tinymobfarm.tooltip.health": "Health: %.1f/%.1f",
   "tinymobfarm.tooltip.hostile": "Mob is hostile.",
   "tinymobfarm.tooltip.capture": "Right click on mob to capture.",
   "tinymobfarm.tooltip.hold_shift": "Hold %s<SHIFT>%s for stats.",
