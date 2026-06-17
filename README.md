@@ -1,88 +1,48 @@
 # Tiny Mob Farm CE
 
-Tiny Mob Farm CE is a Minecraft 1.12.2 Forge mod that adds compact single-block mob farms. Captured mobs are stored in lassos, and farms passively generate drops based on the captured mob.
+Tiny Mob Farm CE is a community-maintained fork of Tiny Mob Farm. This default branch is only the repository landing page. Version-specific source code is maintained on dedicated branches.
 
-中文说明：Tiny Mob Farm CE 是一个 Minecraft 1.12.2 Forge 模组，提供单方块刷怪场。玩家使用套索捕捉生物后，刷怪场会根据套索中的生物被动生成产物。
+Tiny Mob Farm CE 是 Tiny Mob Farm 的社区维护版本。本默认分支仅作为仓库入口页，具体版本源码分别维护在独立分支中。
 
-## Requirements / 需求
+## Version Branches / 版本分支
 
-- Minecraft 1.12.2
-- Minecraft Forge for 1.12.2
-- Java 8
-- CraftTweaker 2 is optional and only needed for custom scripted drops.
+| Minecraft | Branch | Status | Notes |
+| --- | --- | --- | --- |
+| 1.12.2 | [`1.12.2`](https://github.com/wu-xiao-ya/Tiny-Mob-Farm-CE/tree/1.12.2) | Stable / 稳定 | Mature feature line. 原 1.12.2 功能线。 |
+| 1.16.5 | [`1.16.5`](https://github.com/wu-xiao-ya/Tiny-Mob-Farm-CE/tree/1.16.5) | Port / 移植版 | Forge 1.16.5 port with similar core features. Forge 1.16.5 移植线，核心功能与 1.12.2 接近。 |
 
-## Main Features / 主要功能
+Use the matching branch for development, builds, pull requests, and issue reproduction.
 
-- Multiple farm tiers with different production speeds and lasso durability costs.
-- Mechanical farms support item pipe automation for the lasso slot.
-- Captured mobs normally use their vanilla loot table as the production source.
-- Optional CraftTweaker integration for custom mob-specific farm drops.
-- Output-full protection can pause production without consuming lasso durability.
-- Configurable retry interval for full-output situations.
-
-中文：
-
-- 多等级刷怪场，不同等级拥有不同产出速度和套索耐久消耗。
-- 机械版刷怪场支持通过管道输入/输出套索槽。
-- 默认情况下，被捕捉生物使用其原版战利品表作为产出来源。
-- 可选 CraftTweaker 集成，可按生物注册名自定义农场产物。
-- 输出容器已满时可暂停生产，避免吞物品或错误消耗套索耐久。
-- 输出失败后的重试间隔可配置。
-
-## CraftTweaker Custom Drops / CraftTweaker 自定义产物
-
-Import:
-
-```zenscript
-import mods.tinymobfarm.MobDrops;
-```
-
-Fixed amount, fixed chance:
-
-```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 100);
-```
-
-Fixed amount, chance range:
-
-```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 60, 80);
-```
-
-Multiple independent rolls:
-
-```zenscript
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 16, 100);
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 1, 20);
-MobDrops.add("minecraft:zombie", <minecraft:rotten_flesh> * 1, 30);
-```
-
-The example above always produces 16 rotten flesh, then independently rolls a 20% extra drop and a 30% extra drop.
-
-中文说明：
-
-- 同一个生物可以注册多条规则。
-- 每条规则独立判定。
-- 只要 CraftTweaker 规则命中该生物，就会替代原本的战利品表产物。
-- 如果没有 CraftTweaker 规则命中，则回退到原版战利品表逻辑。
-- 输出失败后保存的是已经判定好的本轮产物，后续重试不会重新抽概率。
-
-For full examples, see [docs/crafttweaker.md](docs/crafttweaker.md).
-
-## Configuration / 配置
-
-Important config values:
-
-- `Mob Farm Rate`: production interval for each farm tier, in seconds.
-- `Pause When Output Full`: when enabled, farms wait if generated drops cannot fully fit into adjacent inventories.
-- `Output Retry Interval Ticks`: retry interval after output fails. Default: `20`. Range: `1` to `3600`.
-- `Mob Blacklist`: mob registry names that cannot be captured.
+开发、构建、提交 PR 或复现问题时，请先切换到对应版本分支。
 
 ## Downloads / 下载
 
+- Releases: https://github.com/wu-xiao-ya/Tiny-Mob-Farm-CE/releases
 - Latest release: https://github.com/wu-xiao-ya/Tiny-Mob-Farm-CE/releases/latest
 
-## Credits / 贡献者
+## Main Features / 主要功能
+
+Feature details live in each version branch. In general, Tiny Mob Farm CE provides:
+
+具体功能说明请查看对应版本分支。总体上，本模组提供：
+
+- Compact single-block mob farms.
+- Lasso-based mob capture and release.
+- Vanilla loot table based farm output.
+- Optional CraftTweaker custom drop rules.
+- Multiple farm tiers and mechanical farm automation.
+- Output-full protection and configurable production behavior.
+
+中文：
+
+- 单方块刷怪场。
+- 使用套索捕捉和释放生物。
+- 默认基于原版战利品表生成产物。
+- 可选 CraftTweaker 自定义产物规则。
+- 多等级刷怪场与机械版自动化。
+- 输出满保护与可配置产出行为。
+
+## Contributors / 贡献者
 
 - Original author: David Ma
 - Community Edition maintainer: wu-xiao-ya
@@ -93,10 +53,3 @@ Important config values:
 - 原作者：David Ma
 - 社区版维护：wu-xiao-ya
 - 俄语本地化：Yaroslavik / MrKoteo
-
-## Notes / 注意事项
-
-- This project is a community edition fork.
-- CraftTweaker support is designed for modpack-side customization.
-- Custom CraftTweaker drops are farm outputs, not entity kill events.
-- Default loot-table behavior is preserved when no custom rule matches.
