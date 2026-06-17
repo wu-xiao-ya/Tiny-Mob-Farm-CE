@@ -8,6 +8,8 @@ import cn.davidma.tinymobfarm.core.MobFarmTier;
 import cn.davidma.tinymobfarm.core.drop.MobFarmDropManager;
 import cn.davidma.tinymobfarm.core.util.NBTHelper;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -65,6 +67,8 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     private int outputRetryCooldown;
     private boolean mechanical;
     private boolean powered;
+    private Entity renderModel;
+    private String renderModelMobName = "";
 
     public TileEntityMobFarm() {
         super(ModTileEntities.MOB_FARM.get());
@@ -149,6 +153,23 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     public ItemStackHandler getInventory() {
         return this.inventory;
+    }
+
+    @Nullable
+    public Entity getRenderModel() {
+        if (this.level == null || !this.level.isClientSide || this.getLasso().isEmpty() || !NBTHelper.hasMob(this.getLasso())) {
+            this.renderModel = null;
+            this.renderModelMobName = "";
+            return null;
+        }
+
+        CompoundNBT nbt = NBTHelper.getBaseTag(this.getLasso());
+        String mobName = nbt.getString(NBTHelper.MOB_NAME);
+        if (this.renderModel == null || !mobName.equals(this.renderModelMobName)) {
+            this.renderModel = EntityType.loadEntityRecursive(nbt.getCompound(NBTHelper.MOB_DATA).copy(), this.level, entity -> entity);
+            this.renderModelMobName = mobName;
+        }
+        return this.renderModel;
     }
 
     @Override

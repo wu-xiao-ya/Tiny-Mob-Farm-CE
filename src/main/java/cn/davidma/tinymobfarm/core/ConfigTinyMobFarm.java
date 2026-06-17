@@ -12,6 +12,7 @@ public final class ConfigTinyMobFarm {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOB_BLACKLIST;
     public static final ForgeConfigSpec.ConfigValue<List<? extends Double>> MOB_FARM_SPEED;
     public static final ForgeConfigSpec.IntValue OUTPUT_RETRY_INTERVAL_TICKS;
+    public static final ForgeConfigSpec.BooleanValue RENDER_FARM_MOB_MODEL;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -33,6 +34,9 @@ public final class ConfigTinyMobFarm {
         OUTPUT_RETRY_INTERVAL_TICKS = builder
                 .comment("Ticks between retry attempts when adjacent inventories cannot accept generated drops.")
                 .defineInRange("outputRetryIntervalTicks", 20, 1, 3600);
+        RENDER_FARM_MOB_MODEL = builder
+                .comment("Render the captured mob model inside mob farm blocks.")
+                .define("renderFarmMobModel", true);
         builder.pop();
 
         COMMON_SPEC = builder.build();
@@ -66,5 +70,9 @@ public final class ConfigTinyMobFarm {
 
     public static int getOutputRetryIntervalTicks() {
         return OUTPUT_RETRY_INTERVAL_TICKS.get();
+    }
+
+    public static boolean shouldRenderFarmMobModel() {
+        return RENDER_FARM_MOB_MODEL.get();
     }
 }
