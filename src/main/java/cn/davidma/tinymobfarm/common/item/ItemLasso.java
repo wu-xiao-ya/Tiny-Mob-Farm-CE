@@ -27,7 +27,7 @@ import net.minecraftforge.common.util.Constants;
 
 public class ItemLasso extends Item {
     public ItemLasso(Properties properties) {
-        super(properties.stacksTo(1));
+        super(properties);
     }
 
     public static boolean hasMob(ItemStack stack) {
