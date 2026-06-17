@@ -19,6 +19,7 @@
   "itemGroup.tinymobfarm": "微型刷怪场社区版",
   "tinymobfarm.error.cannot_capture_boss": "无法捕捉 Boss 生物。",
   "tinymobfarm.error.blacklisted_mob": "该生物在黑名单中。",
+  "tinymobfarm.error.release_failed": "释放生物失败，套索会保留已捕捉的生物。",
   "tinymobfarm.gui.higher_tier": "该生物需要更高等级的刷怪场。",
   "tinymobfarm.gui.redstone_disable": "已被红石信号禁用。",
   "tinymobfarm.gui.no_lasso": "放入已捕捉生物的套索以启动。",

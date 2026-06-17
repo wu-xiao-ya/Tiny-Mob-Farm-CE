@@ -142,16 +142,18 @@ public class ItemLasso extends Item {
             return loadedEntity;
         });
 
-        if (entity != null) {
-            context.getLevel().addFreshEntity(entity);
-        }
-
-        NBTHelper.clearMob(stack);
         PlayerEntity player = context.getPlayer();
-        if (player != null) {
-            stack.hurtAndBreak(1, player, brokenPlayer -> brokenPlayer.broadcastBreakEvent(context.getHand()));
-            player.inventory.setChanged();
-            player.inventoryMenu.broadcastChanges();
+        boolean added = entity != null && context.getLevel().addFreshEntity(entity);
+
+        if (added) {
+            NBTHelper.clearMob(stack);
+            if (player != null) {
+                stack.hurtAndBreak(1, player, brokenPlayer -> brokenPlayer.broadcastBreakEvent(context.getHand()));
+                player.inventory.setChanged();
+                player.inventoryMenu.broadcastChanges();
+            }
+        } else if (player != null && !player.level.isClientSide) {
+            player.displayClientMessage(new TranslationTextComponent("tinymobfarm.error.release_failed"), true);
         }
     }
 

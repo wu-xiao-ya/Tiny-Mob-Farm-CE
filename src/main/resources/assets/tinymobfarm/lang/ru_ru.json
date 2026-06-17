@@ -19,6 +19,7 @@
   "itemGroup.tinymobfarm": "Tiny Mob Farm CE",
   "tinymobfarm.error.cannot_capture_boss": "Нельзя поймать босса.",
   "tinymobfarm.error.blacklisted_mob": "Этот моб в черном списке",
+  "tinymobfarm.error.release_failed": "Не удалось освободить моба. Лассо сохранит пойманного моба.",
   "tinymobfarm.gui.higher_tier": "Этому существу нужен более высокий уровень фермы.",
   "tinymobfarm.gui.redstone_disable": "Отключено сигналом редстоуна.",
   "tinymobfarm.gui.no_lasso": "Разместите лассо, чтобы активировать",
