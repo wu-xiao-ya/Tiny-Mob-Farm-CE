@@ -18,6 +18,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
@@ -65,11 +66,13 @@ public final class EntityHelper {
             return new ArrayList<>();
         }
 
+        FakePlayer fakePlayer = FakePlayerHelper.getPlayer(world);
         LootContext context = new LootContext.Builder(world)
                 .withParameter(LootParameters.THIS_ENTITY, entity)
-                .withParameter(LootParameters.DAMAGE_SOURCE, DamageSource.GENERIC)
-                .withParameter(LootParameters.KILLER_ENTITY, entity)
-                .withParameter(LootParameters.DIRECT_KILLER_ENTITY, entity)
+                .withParameter(LootParameters.LAST_DAMAGE_PLAYER, fakePlayer)
+                .withParameter(LootParameters.DAMAGE_SOURCE, DamageSource.playerAttack(fakePlayer))
+                .withParameter(LootParameters.KILLER_ENTITY, fakePlayer)
+                .withParameter(LootParameters.DIRECT_KILLER_ENTITY, fakePlayer)
                 .withParameter(LootParameters.ORIGIN, Vector3d.ZERO)
                 .create(LootParameterSets.ENTITY);
         return lootTable.getRandomItems(context);
