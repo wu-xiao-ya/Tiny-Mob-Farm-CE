@@ -70,6 +70,21 @@ public final class MobFarmDropManager {
                 mobTag.getCompound(NBTHelper.MOB_DATA), world));
     }
 
+    public static boolean hasCustomRules(String mobRegistryName) {
+        return !getCustomRules(mobRegistryName).isEmpty();
+    }
+
+    public static List<ItemStack> generateCustomDrops(String mobRegistryName, Random random) {
+        return generateCustomDrops(getCustomRules(mobRegistryName), random);
+    }
+
+    public static List<ItemStack> generateLootTableDrops(String lootTableLocation, CompoundNBT mobData, ServerWorld world) {
+        if (lootTableLocation.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return copyDrops(EntityHelper.generateLoot(new ResourceLocation(lootTableLocation), mobData.copy(), world));
+    }
+
     private static List<ItemStack> generateCustomDrops(List<MobFarmDropRule> rules, Random random) {
         List<ItemStack> drops = new ArrayList<>();
         for (MobFarmDropRule rule : rules) {

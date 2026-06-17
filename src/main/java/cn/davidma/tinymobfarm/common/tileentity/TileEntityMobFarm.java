@@ -38,6 +38,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
     private final ItemStackHandler inventory = new ItemStackHandler(1) {
@@ -45,6 +46,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         protected void onContentsChanged(int slot) {
             TileEntityMobFarm.this.pendingDrops.clear();
             TileEntityMobFarm.this.outputRetryCooldown = 0;
+            TileEntityMobFarm.this.clearDropSourceCache();
             TileEntityMobFarm.this.setChangedAndSync();
         }
 
@@ -65,6 +67,12 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     private List<ItemStack> pendingDrops = new ArrayList<>();
     private int currProgress;
     private int outputRetryCooldown;
+    private String cachedDropSourceKey = "";
+    private int cachedDropSourceVersion = -1;
+    private boolean cachedDropSourceUsesCustomRules;
+    private String cachedMobRegistryName = "";
+    private String cachedLootTableLocation = "";
+    private CompoundNBT cachedMobData = new CompoundNBT();
     private boolean mechanical;
     private boolean powered;
     private Entity renderModel;
@@ -352,7 +360,7 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
 
     private void finishProgress(int maxProgress) {
         List<ItemStack> drops = this.compactDrops(this.pendingDrops.isEmpty()
-                ? MobFarmDropManager.generateDrops(this.getLasso(), (ServerWorld) this.level)
+                ? this.generateDrops()
                 : this.copyDrops(this.pendingDrops));
 
         if (this.outputDrops(drops)) {
@@ -369,12 +377,85 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
     }
 
     private boolean outputDrops(List<ItemStack> drops) {
+        if (ConfigTinyMobFarm.shouldPauseWhenOutputFull() && !this.canStoreDrops(drops)) {
+            return false;
+        }
+
         this.insertDropsIntoAdjacentInventories(drops);
         if (!ConfigTinyMobFarm.shouldPauseWhenOutputFull()) {
             this.dropRemainingDrops(drops);
             drops.clear();
         }
         return drops.isEmpty();
+    }
+
+    private boolean canStoreDrops(List<ItemStack> drops) {
+        if (drops.isEmpty()) {
+            return true;
+        }
+
+        List<ItemStack> remaining = this.copyDrops(drops);
+        for (Direction direction : Direction.values()) {
+            TileEntity tileEntity = this.level.getBlockEntity(this.worldPosition.relative(direction));
+            if (tileEntity == null) {
+                continue;
+            }
+
+            LazyOptional<IItemHandler> capability = tileEntity.getCapability(
+                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+            IItemHandler itemHandler = capability.orElse(null);
+            if (itemHandler == null) {
+                continue;
+            }
+
+            SimulatedInventory simulatedInventory = new SimulatedInventory(itemHandler);
+            for (int i = 0; i < remaining.size(); i++) {
+                ItemStack remainder = simulatedInventory.insertItemStacked(remaining.get(i));
+                if (remainder.isEmpty()) {
+                    remaining.remove(i);
+                    i--;
+                } else {
+                    remaining.set(i, remainder);
+                }
+            }
+
+            if (remaining.isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private List<ItemStack> generateDrops() {
+        if (this.level == null || this.level.isClientSide || !(this.level instanceof ServerWorld)) {
+            return new ArrayList<>();
+        }
+
+        ItemStack lasso = this.getLasso();
+        if (lasso.isEmpty() || !NBTHelper.hasMob(lasso)) {
+            return new ArrayList<>();
+        }
+
+        CompoundNBT mobTag = NBTHelper.getBaseTag(lasso);
+        CompoundNBT mobData = mobTag.getCompound(NBTHelper.MOB_DATA);
+        String mobRegistryName = mobData.getString("id");
+        String lootTableLocation = mobTag.getString(NBTHelper.MOB_LOOTTABLE_LOCATION);
+        int dropSourceVersion = MobFarmDropManager.getDropSourceVersion();
+        String cacheKey = mobRegistryName + "|" + lootTableLocation;
+
+        if (!Objects.equals(this.cachedDropSourceKey, cacheKey) || this.cachedDropSourceVersion != dropSourceVersion) {
+            this.cachedDropSourceUsesCustomRules = MobFarmDropManager.hasCustomRules(mobRegistryName);
+            this.cachedMobRegistryName = mobRegistryName;
+            this.cachedLootTableLocation = lootTableLocation;
+            this.cachedMobData = mobData.copy();
+            this.cachedDropSourceKey = cacheKey;
+            this.cachedDropSourceVersion = dropSourceVersion;
+        }
+
+        return this.cachedDropSourceUsesCustomRules
+                ? MobFarmDropManager.generateCustomDrops(this.cachedMobRegistryName, this.level.random)
+                : MobFarmDropManager.generateLootTableDrops(this.cachedLootTableLocation, this.cachedMobData, (ServerWorld) this.level);
     }
 
     private void insertDropsIntoAdjacentInventories(List<ItemStack> drops) {
@@ -496,11 +577,108 @@ public class TileEntityMobFarm extends TileEntity implements ITickableTileEntity
         }
     }
 
+    private void clearDropSourceCache() {
+        this.cachedDropSourceKey = "";
+        this.cachedDropSourceVersion = -1;
+        this.cachedDropSourceUsesCustomRules = false;
+        this.cachedMobRegistryName = "";
+        this.cachedLootTableLocation = "";
+        this.cachedMobData = new CompoundNBT();
+    }
+
     private void setChangedAndSync() {
         this.setChanged();
         if (this.level != null && !this.level.isClientSide) {
             BlockState state = this.getBlockState();
             this.level.sendBlockUpdated(this.worldPosition, state, state, 3);
+        }
+    }
+
+    private static class SimulatedInventory {
+        private final IItemHandler itemHandler;
+        private final List<ItemStack> stacks = new ArrayList<>();
+
+        private SimulatedInventory(IItemHandler itemHandler) {
+            this.itemHandler = itemHandler;
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                this.stacks.add(itemHandler.getStackInSlot(i).copy());
+            }
+        }
+
+        private ItemStack insertItemStacked(ItemStack stack) {
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+
+            ItemStack remainder = stack.copy();
+            if (remainder.isStackable()) {
+                for (int i = 0; i < this.stacks.size(); i++) {
+                    if (ItemHandlerHelper.canItemStacksStackRelaxed(this.stacks.get(i), remainder)) {
+                        remainder = this.insertItem(i, remainder);
+                        if (remainder.isEmpty()) {
+                            return ItemStack.EMPTY;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < this.stacks.size(); i++) {
+                if (this.stacks.get(i).isEmpty()) {
+                    remainder = this.insertItem(i, remainder);
+                    if (remainder.isEmpty()) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+            }
+
+            return remainder;
+        }
+
+        private ItemStack insertItem(int slot, ItemStack stack) {
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+
+            ItemStack current = this.stacks.get(slot);
+            int slotLimit = Math.min(this.itemHandler.getSlotLimit(slot), stack.getMaxStackSize());
+            if (slotLimit <= 0) {
+                return stack;
+            }
+
+            int insertLimit = slotLimit;
+            if (!current.isEmpty()) {
+                if (!ItemHandlerHelper.canItemStacksStackRelaxed(current, stack)) {
+                    return stack;
+                }
+
+                insertLimit = slotLimit - current.getCount();
+                if (insertLimit <= 0) {
+                    return stack;
+                }
+            }
+
+            ItemStack candidate = stack.copy();
+            if (candidate.getCount() > insertLimit) {
+                candidate.setCount(insertLimit);
+            }
+
+            ItemStack rejected = this.itemHandler.insertItem(slot, candidate.copy(), true);
+            int accepted = candidate.getCount() - rejected.getCount();
+            if (accepted <= 0) {
+                return stack;
+            }
+
+            if (current.isEmpty()) {
+                ItemStack inserted = candidate.copy();
+                inserted.setCount(accepted);
+                this.stacks.set(slot, inserted);
+            } else {
+                current.grow(accepted);
+            }
+
+            ItemStack remainder = stack.copy();
+            remainder.shrink(accepted);
+            return remainder.isEmpty() ? ItemStack.EMPTY : remainder;
         }
     }
 }

@@ -1,8 +1,8 @@
 # Tiny Mob Farm CE
 
-> Branch status: `main` contains the Minecraft 1.12.2 line. The `1.16.5` branch contains the Forge 1.16.5 port with the main gameplay systems migrated and passing build/server-start checks.
+> Branch status: `main` contains the Minecraft 1.12.2 line. The `1.16.5` branch contains the Forge 1.16.5 port line.
 >
-> 分支状态：`main` 保留 Minecraft 1.12.2 版本线。`1.16.5` 分支用于 Forge 1.16.5 移植，核心玩法系统已迁移，并通过构建与专服启动检查。
+> 分支状态：`main` 保留 Minecraft 1.12.2 版本线。`1.16.5` 分支用于 Forge 1.16.5 移植线。
 
 Tiny Mob Farm CE is a Minecraft Forge mod that adds compact single-block mob farms. Captured mobs are stored in lassos, and farms passively generate drops based on the captured mob.
 
@@ -11,7 +11,7 @@ Tiny Mob Farm CE is a Minecraft Forge mod that adds compact single-block mob far
 ## Requirements / 需求
 
 - Minecraft 1.12.2 on `main`, or Minecraft 1.16.5 on the `1.16.5` branch
-- Minecraft Forge for the selected Minecraft version
+- Minecraft Forge for the selected Minecraft version. The 1.16.5 branch is built against Forge `36.2.42`.
 - Java 8
 - CraftTweaker is optional and only needed for custom scripted drops.
 

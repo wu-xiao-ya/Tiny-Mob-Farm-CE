@@ -4,7 +4,6 @@ import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.monster.MonsterEntity;
@@ -48,16 +47,12 @@ public final class EntityHelper {
     }
 
     public static boolean canCapture(LivingEntity entity) {
-        return entity instanceof MobEntity
-                && !isBoss(entity)
+        return !isBoss(entity)
                 && !entity.isDeadOrDying();
     }
 
     public static String getLootTableLocation(LivingEntity entity) {
-        if (entity instanceof MobEntity) {
-            return ((MobEntity) entity).getLootTable().toString();
-        }
-        return "";
+        return entity.getType().getDefaultLootTable().toString();
     }
 
     public static List<ItemStack> generateLoot(ResourceLocation lootTableLocation, CompoundNBT mobData, ServerWorld world) {

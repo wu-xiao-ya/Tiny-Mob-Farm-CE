@@ -1,10 +1,10 @@
 # Tiny Mob Farm CE 1.16.5 Migration
 
-This branch contains the Minecraft Forge 1.16.5 porting work.
+This branch contains the Minecraft Forge 1.16.5 port line.
 
 ## Scope
 
-The 1.16.5 version should preserve the 1.12.2 feature set where practical:
+The 1.16.5 port aims to preserve the 1.12.2 feature set where practical. Current migration scope includes:
 
 - Lasso capture and release.
 - Eight mob farm tiers, with normal and mechanical variants.
@@ -20,19 +20,19 @@ The 1.16.5 version should preserve the 1.12.2 feature set where practical:
 
 ## Initial Porting Policy
 
-The branch first establishes a Forge 1.16.5 buildable baseline:
+The branch was established from a Forge 1.16.5 buildable baseline:
 
 - ForgeGradle 4.x.
-- Minecraft Forge 1.16.5.
+- Minecraft Forge 1.16.5, currently built against Forge `36.2.42`.
 - `META-INF/mods.toml`.
 - `pack_format` 6.
 - JSON language files.
 
-The 1.12.2 Java implementation is intentionally not compiled in this baseline because it depends on removed 1.12.2 APIs. Core gameplay code will be ported back in controlled slices.
+The 1.12.2 Java implementation is retained under `src/legacy112/java` for reference and is intentionally not compiled because it depends on removed 1.12.2 APIs. Gameplay code has been migrated in controlled slices rather than by compiling the legacy sources directly.
 
 ## CraftTweaker
 
-CraftTweaker support has been ported to the 1.16.5 CraftTweaker 7 API as an optional dependency. Scripts use:
+CraftTweaker support uses the 1.16.5 CraftTweaker 7 API as an optional dependency. Scripts use:
 
 ```zenscript
 import mods.tinymobfarm.MobDrops;
@@ -40,7 +40,7 @@ import mods.tinymobfarm.MobDrops;
 
 When a rule matches the captured mob registry name, the scripted drops replace the vanilla loot table result for that production cycle. If no rule matches, the farm falls back to the vanilla loot table behavior.
 
-The 1.16.5 branch supports the same custom-drop concepts as the mature 1.12.2 line:
+The 1.16.5 branch currently supports these custom-drop concepts from the mature 1.12.2 line:
 
 - fixed stack amounts using `<item> * amount`;
 - fixed chances;

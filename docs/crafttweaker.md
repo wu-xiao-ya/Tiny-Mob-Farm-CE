@@ -13,22 +13,22 @@ import mods.tinymobfarm.MobDrops;
 ## Behavior / 行为
 
 - Rules are matched by mob registry name, for example `minecraft:zombie`.
-- If one or more rules match a mob, the CraftTweaker result replaces the normal loot table result.
-- If no rule matches, the farm uses the original loot table behavior.
 - Multiple rules for the same mob are allowed.
 - Each rule is rolled independently.
 - All matching rules run in registration order and their drops are combined. There is no priority value and no first-match-only mode.
-- Pending drops are stored after generation. Output retries do not reroll chances.
+- If one or more rules match a mob, the combined CraftTweaker result replaces the normal loot table result.
+- If no rule matches, the farm uses the original loot table behavior.
+- Current implementation stores pending drops after generation. Output retries do not reroll chances.
 
 中文：
 
 - 规则按生物注册名匹配，例如 `minecraft:zombie`。
-- 只要某个生物存在 CraftTweaker 规则，就使用 CraftTweaker 产物替代原本战利品表产物。
-- 没有规则命中时，仍使用原本战利品表逻辑。
 - 同一生物允许写多条规则。
 - 每条规则独立判定。
 - 同一生物的全部匹配规则会按注册顺序执行并合并产物；没有优先级参数，也不会只执行第一条。
-- 产物生成后会保存待输出产物；输出重试不会重新判定概率。
+- 只要某个生物存在 CraftTweaker 规则，就使用合并后的 CraftTweaker 产物替代原本战利品表产物。
+- 没有规则命中时，仍使用原本战利品表逻辑。
+- 当前实现会在产物生成后保存待输出产物；输出重试不会重新判定概率。
 
 ## API / 接口
 
