@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.9-beta
+
+### 中文
+
+- 优化外部配置热重载，将配置文件检查间隔由 20 tick 调整为 200 tick（正常 TPS 下约 10 秒）。
+- 修复单人游戏中客户端 Tick 与集成服务端 Tick 共用计数器造成的重复检查和跨线程竞争；现在每个物理端只使用一条轮询路径。
+- 将 `File.isFile()` 和 `File.lastModified()` 两次文件属性查询合并为一次 NIO 属性读取，进一步减少主线程文件系统调用。
+- 保留配置界面修改后的即时同步，以及外部修改配置文件后的自动重载。
+
+### English
+
+- Reduced external config polling from every 20 ticks to every 200 ticks, approximately 10 seconds at normal TPS.
+- Fixed duplicate checks and a shared-counter race between client ticks and integrated-server ticks; each physical side now uses only one polling path.
+- Replaced separate `File.isFile()` and `File.lastModified()` calls with one NIO attribute read to further reduce main-thread filesystem access.
+- Preserved immediate config-screen synchronization and automatic reloads after external file edits.
+
 ## 1.0.8-beta
 
 ### 中文

@@ -1,22 +1,32 @@
 package cn.davidma.tinymobfarm.core.util;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import cn.davidma.tinymobfarm.core.ConfigTinyMobFarm;
 import cn.davidma.tinymobfarm.core.Reference;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class ConfigReloadHandler {
 
-	private final File configFile;
+	private static final int CHECK_INTERVAL_TICKS = 20 * 10;
+
+	private final Path configPath;
+	private final Side physicalSide;
 	private long lastModified;
 	private int tickCounter;
 
 	public ConfigReloadHandler() {
-		this.configFile = new File(Loader.instance().getConfigDir(), Reference.MOD_ID + ".cfg");
+		this.configPath = Loader.instance().getConfigDir().toPath().resolve(Reference.MOD_ID + ".cfg");
+		this.physicalSide = FMLCommonHandler.instance().getSide();
 		this.lastModified = this.getCurrentLastModified();
 	}
 
@@ -25,26 +35,27 @@ public class ConfigReloadHandler {
 		if (Reference.MOD_ID.equals(event.getModID())) {
 			ConfigTinyMobFarm.syncConfig();
 			this.lastModified = this.getCurrentLastModified();
+			this.tickCounter = 0;
 		}
 	}
 
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
-		if (event.phase == TickEvent.Phase.END) {
+		if (this.physicalSide.isClient() && event.phase == TickEvent.Phase.END) {
 			this.checkForExternalConfigChange();
 		}
 	}
 
 	@SubscribeEvent
 	public void onServerTick(TickEvent.ServerTickEvent event) {
-		if (event.phase == TickEvent.Phase.END) {
+		if (this.physicalSide.isServer() && event.phase == TickEvent.Phase.END) {
 			this.checkForExternalConfigChange();
 		}
 	}
 
 	private void checkForExternalConfigChange() {
 		this.tickCounter++;
-		if (this.tickCounter < 20) {
+		if (this.tickCounter < CHECK_INTERVAL_TICKS) {
 			return;
 		}
 
@@ -57,6 +68,12 @@ public class ConfigReloadHandler {
 	}
 
 	private long getCurrentLastModified() {
-		return this.configFile.isFile() ? this.configFile.lastModified() : -1L;
+		try {
+			BasicFileAttributes attributes = Files.readAttributes(
+					this.configPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+			return attributes.isRegularFile() ? attributes.lastModifiedTime().toMillis() : -1L;
+		} catch (IOException ignored) {
+			return -1L;
+		}
 	}
 }
